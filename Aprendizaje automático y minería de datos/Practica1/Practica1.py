@@ -55,6 +55,7 @@ def one_variable_linear_regresion(alpha_ = 0.01, num_iter = 1500):
 
         print(J)
 
+    #pintado de la gráfica y nue de puntos
     plt.scatter(X, Y, alpha= 0.5)
     plt.plot([5, 22], [hth(5,Z) , hth(22, Z)], color = "red")
 
@@ -62,7 +63,30 @@ def one_variable_linear_regresion(alpha_ = 0.01, num_iter = 1500):
     Y_axis_th1 = np.linspace(-1, 4, 20)
 
 
+
     plt.show()
     
 
-one_variable_linear_regresion()
+def multiple_variable_linear_regresion(alpha_ = 0.01, num_iter = 1500):
+        poblacion_multiple_variables = carga_csv("ex1data2.csv")
+
+        pies_cuadrados = np.array(poblacion_multiple_variables[:, 0])
+        num_habitaciones = np.array(poblacion_multiple_variables[:, 1])
+        precio = np.array(poblacion_multiple_variables[:, 2])
+
+        media_pies = np.average(pies_cuadrados)
+        media_num_habit = np.average(num_habitaciones)
+        media_precio = np.average(precio)
+
+        #para la desviacion estandar usar npy std
+
+
+
+
+
+
+
+
+
+#one_variable_linear_regresion()
+multiple_variable_linear_regresion()
