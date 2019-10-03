@@ -22,7 +22,6 @@ def one_variable_linear_regresion(alpha_ = 0.01, num_iter = 1500):
     Y = np.array(poblacion[:,1]) #sería nuestra variable independiente o el valor resultante de evaluar la función en X
 
     m = len(X)
-    
     #construimos matriz Z
     th0 = 0
     th1 = 0
@@ -53,7 +52,8 @@ def one_variable_linear_regresion(alpha_ = 0.01, num_iter = 1500):
         #Reconstruimos Z a partir de los nuevos valores de 
         Z = [th0, th1]
 
-        print(J)
+    #    print(J)
+    
 
     #pintado de la gráfica y nue de puntos
     plt.scatter(X, Y, alpha= 0.5)
@@ -81,12 +81,9 @@ def multiple_variable_linear_regresion(alpha_ = 0.01, num_iter = 1500):
         #para la desviacion estandar usar npy std
 
 
-
-
-
-
+one_variable_linear_regresion()
 
 
 
 #one_variable_linear_regresion()
-multiple_variable_linear_regresion()
+#multiple_variable_linear_regresion()
