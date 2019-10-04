@@ -31,7 +31,7 @@ def pinta_costes():
 
     X = np.hstack([np.ones([X_m,1]),X])
 
-    num_div = 1000
+    num_div = 25
     x_theta0 = np.linspace(-10, 10 ,num_div)
     y_theta1 = np.linspace(-1, 4, num_div)
 
