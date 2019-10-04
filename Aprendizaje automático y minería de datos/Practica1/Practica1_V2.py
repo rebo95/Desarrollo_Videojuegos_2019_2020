@@ -31,7 +31,7 @@ def pinta_costes():
 
     X = np.hstack([np.ones([X_m,1]),X])
 
-    num_div = 3
+    num_div = 1000
     x_theta0 = np.linspace(-10, 10 ,num_div)
     y_theta1 = np.linspace(-1, 4, num_div)
 
@@ -46,26 +46,25 @@ def pinta_costes():
     dim_0 = xx_thetas0.shape[0]
     dim_1 = xx_thetas0.shape[1]
 
+    J = np.zeros((dim_0, dim_1))
 
-    Costes = np.array([])
 
     for i in range(dim_0):
         for j in range(dim_1):
 
             Z = np.array([xx_thetas0[i,j], yy_thetas1[i,j]])
-            J = funcion_coste(X, Y, Z)
-
-            Costes = np.append(Costes, [J], axis = 0)
-
-            
+            J[i,j] = funcion_coste(X, Y, Z)
     
-    print(Costes)
+    print(J)
+
+    
     fig = plt.figure()
     ax = Axes3D(fig)
 
-    surf = ax.plot_surface(X, Y, Costes)
+    surf = ax.plot_surface(xx_thetas0, yy_thetas1, J)
     fig.colorbar(surf, shrink = 0.5, aspect = 5)
     plt.show()
+    
 
     
 
