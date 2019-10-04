@@ -18,60 +18,37 @@ def hth(x, th): #Hipótesis modelo lineal
 def H_Theta(X, Z): #Hipótesis del mocelo lineal vectorizada 
     return np.dot(X, Z)
 
-def pinta_costes():
+def pinta_costes(X, Y, num_div = 100):
 
-
-    poblacion = carga_csv('ex1data1.csv')
-
-    X = poblacion[:, :-1]
-    Y = poblacion[: , -1]
-
-    X_m = np.shape(X)[0]
-    Y_m = np.shape(X)[1]
-
-    X = np.hstack([np.ones([X_m,1]),X])
-
-    num_div = 25
     x_theta0 = np.linspace(-10, 10 ,num_div)
     y_theta1 = np.linspace(-1, 4, num_div)
 
-    xx_thetas0, yy_thetas1 = np.meshgrid(x_theta0, y_theta1)
-
-    thetas = np.zeros((num_div * num_div,2))
+    xx_thetas0, yy_thetas1 = np.meshgrid(x_theta0, y_theta1) #junta las matrices que servirán de ejes para nuestra representación de lls datos
     
-
-    print(xx_thetas0)
-    print(yy_thetas1)
-
     dim_0 = xx_thetas0.shape[0]
     dim_1 = xx_thetas0.shape[1]
 
-    J = np.zeros((dim_0, dim_1))
-
+    J = np.zeros((dim_0, dim_1)) #contiene la matriz J de costes asociados a cada par de thetas introducidos, cada coste se almacena en una matriz coincidiendo con el valor de fila y columna del que se extrageron sus parametros para ser calculado
 
     for i in range(dim_0):
         for j in range(dim_1):
 
             Z = np.array([xx_thetas0[i,j], yy_thetas1[i,j]])
-            J[i,j] = funcion_coste(X, Y, Z)
-    
-    print(J)
+            J[i,j] = funcion_coste(X, Y, Z) #vamos calvulado los costes para los diferentes valres de theta0 y theta1 almacenados en Z y teniendo en cuenta los valores de X e Y necesarios para el calculo del coste
 
-    
+    #dibujamos la curva de costes    
     fig = plt.figure()
     ax = Axes3D(fig)
-
-    surf = ax.plot_surface(xx_thetas0, yy_thetas1, J)
+    surf = ax.plot_surface(xx_thetas0, yy_thetas1, J, cmap= cm.coolwarm, linewidths= 0, antialiaseds = False)
     fig.colorbar(surf, shrink = 0.5, aspect = 5)
     plt.show()
+
+    #mapa de nivel de costes
+    plt.contour(xx_thetas0, yy_thetas1, J, np.logspace(-2, 3, 20), colors = "blue")
+    plt.show()
+
+
     
-
-    
-
-
-
-
-
 
 def resuelve_problema():
     poblacion = carga_csv('ex1data1.csv')
@@ -85,6 +62,10 @@ def resuelve_problema():
     X_ = np.hstack([np.ones([X_m,1]),X_])
 
     Thetas, Costes = descenso_gradiente(X_, Y_, alpha = 0.01)
+
+    pinta_costes(X_, Y_)
+
+
 
 
 def descenso_gradiente(X, Y, alpha):
@@ -146,6 +127,6 @@ def funcion_coste(X, Y, Theta): #funcion de costes vectorizada
     return sumatory
 
 
-pinta_costes()
-#resuelve_problema()
+
+resuelve_problema()
 
