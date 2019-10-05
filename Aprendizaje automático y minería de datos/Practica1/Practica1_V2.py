@@ -86,8 +86,7 @@ def descenso_gradiente(X, Y, alpha):
     Costes = np.array([]) #almacena los costes obtenidos durante el descenso de gradiente
 
     X_aux = np.array(X[:,1])
-
-    
+ 
     for i in range(1500):
 
         #Calculo de Theta 0
@@ -114,11 +113,52 @@ def descenso_gradiente(X, Y, alpha):
 
         Costes = np.append(Costes, [J], axis = 0)
 
+    return Thetas, Costes
 
 
-    plt.scatter(X_aux, Y, alpha= 0.5)
-    plt.plot([5, 22], [hth(5,Z) , hth(22, Z)], color = "red")
-    plt.show()
+def descenso_gradiente_multiple_variable(X, Y, alpha):
+    
+    m = len(X)
+
+    #construimos matriz Z
+    th0 = 0.0
+    th1 = 0.0
+
+    Z = np.array([th0 ,th1])
+    #z debe tener la misma dimensión que el numero de parámetos que vamos a tener, es decir, shape(X) - 1
+
+    alpha_m = (alpha/m)
+
+    Thetas = np.array([[th0, th1]]) #almacena los thetas que forman parte de la hipotesis h_theta
+    Costes = np.array([]) #almacena los costes obtenidos durante el descenso de gradiente
+ 
+    for i in range(1500):
+
+        #Calculo de Theta 0
+        #Sumatorio para el calculo de Theta0
+        sum1 = H_Theta(X, Z) - Y
+        sum1_ = sum1.sum()
+        th0 -= alpha_m * sum1_
+
+        #Calculo Theta 1, 2, 3 ... n
+        #Sumatorio para el calculo de Theta1
+        for k in range(X.shape[1] - 1):
+            sum2 =  (H_Theta(X, Z) - Y) * X[:, k + 1]
+            sum2_ = sum2.sum()
+        
+
+        th1 -= alpha_m * sum2_
+
+        Z[0] = th0
+        Z[1] = th1
+
+        
+        Thetas = np.append(Thetas, [[th0, th1]], axis= 0)
+
+        #funcion de costes
+        J = funcion_coste(X,Y, Z)
+
+        Costes = np.append(Costes, [J], axis = 0)
 
     return Thetas, Costes
 
@@ -133,31 +173,31 @@ def resuelve_problema_regresion_una_variable():
 
     X_ = np.hstack([np.ones([X_m,1]),X_])
 
-    Thetas, Costes = descenso_gradiente(X_, Y_, alpha = 0.01)
+    Thetas, Costes = descenso_gradiente_multiple_variable(X_, Y_, alpha = 0.01)
+
+    
+    plt.scatter(np.array(X_[:,1]), Y_, alpha= 0.5)
+    plt.plot([5, 22], [hth(5,Thetas[-1]) , hth(22, Thetas[-1])], color = "red")
+    plt.show()
+    
 
     pinta_costes(X_, Y_)
 
 
 def resuelve_problema_regresion_varias_variables():
+    
     poblacion = carga_csv('ex1data2.csv')
 
-    X_normalizada, mu, sigma = normaliza(poblacion)
-    X_m = np.shape(X_normalizada)[0]
-
-
-    X_n = X_normalizada[: , :-1]
-    Y_n = X_normalizada[: , -1]
-
-    X_n = np.hstack([np.ones([X_m, 1]), X_n]) #le añadimos la columna de unos a la matriz ya normalizada
-
-    print(X_n)
-    print(Y_n)
-
-    print(mu)
-    print(sigma)
-
+    X = poblacion[: , :-1]
+    Y = poblacion[: , -1]
 
     
+    X_normalizada, mu, sigma = normaliza(X)
+
+    X_shape_1 = np.shape(X_normalizada)[0]
+
+    X_normalizada = np.hstack([np.ones([X_shape_1, 1]), X_normalizada]) #le añadimos la columna de unos a la matriz ya normalizada
+
 
 
 def descenso_gradiente_varias_variables():
@@ -169,6 +209,6 @@ def descenso_gradiente_varias_variables():
             
 
 
-
-resuelve_problema_regresion_varias_variables()
+resuelve_problema_regresion_una_variable()
+#resuelve_problema_regresion_varias_variables()
 
