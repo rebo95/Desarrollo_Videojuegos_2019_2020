@@ -47,25 +47,27 @@ def pinta_costes(X, Y, num_div = 100):
     plt.contour(xx_thetas0, yy_thetas1, J, np.logspace(-2, 3, 20), colors = "blue")
     plt.show()
 
+def normaliza(X): #Se entiende que se deben normalizar todos los atributos de la matriz ponlación
 
+    X_normalizada = np.zeros((X.shape[0], X.shape[1]))
+
+    mu = np.zeros(X.shape[1])
+    sigma = np.zeros(X.shape[1])
     
+    np.median(X, axis = 0, out = mu)
+    np.std(X, axis = 0, out = sigma)
 
-def resuelve_problema():
-    poblacion = carga_csv('ex1data1.csv')
+    for i in range(X.shape[0]):
+        for j in range(X.shape[1]):
+            X_normalizada[i,j] = (X[i,j] - mu[j])/sigma[j] 
+    
+    return X_normalizada, mu, sigma
 
-    X_ = poblacion[:, :-1]
-    Y_ = poblacion[: , -1]
-
-    X_m = np.shape(X_)[0]
-    Y_m = np.shape(X_)[1]
-
-    X_ = np.hstack([np.ones([X_m,1]),X_])
-
-    Thetas, Costes = descenso_gradiente(X_, Y_, alpha = 0.01)
-
-    pinta_costes(X_, Y_)
-
-
+def funcion_coste(X, Y, Theta): #funcion de costes vectorizada
+    H = H_Theta(X,Theta)
+    Aux = (H-Y)**2
+    sumatory = Aux.sum()/(2 * len(X))
+    return sumatory
 
 
 def descenso_gradiente(X, Y, alpha):
@@ -120,13 +122,53 @@ def descenso_gradiente(X, Y, alpha):
 
     return Thetas, Costes
 
-def funcion_coste(X, Y, Theta): #funcion de costes vectorizada
-    H = H_Theta(X,Theta)
-    Aux = (H-Y)**2
-    sumatory = Aux.sum()/(2 * len(X))
-    return sumatory
+def resuelve_problema_regresion_una_variable():
+    poblacion = carga_csv('ex1data1.csv')
+
+    X_ = poblacion[:, :-1]
+    Y_ = poblacion[: , -1]
+
+    X_m = np.shape(X_)[0]
+    Y_m = np.shape(X_)[1]
+
+    X_ = np.hstack([np.ones([X_m,1]),X_])
+
+    Thetas, Costes = descenso_gradiente(X_, Y_, alpha = 0.01)
+
+    pinta_costes(X_, Y_)
+
+
+def resuelve_problema_regresion_varias_variables():
+    poblacion = carga_csv('ex1data2.csv')
+
+    X_normalizada, mu, sigma = normaliza(poblacion)
+    X_m = np.shape(X_normalizada)[0]
+
+
+    X_n = X_normalizada[: , :-1]
+    Y_n = X_normalizada[: , -1]
+
+    X_n = np.hstack([np.ones([X_m, 1]), X_n]) #le añadimos la columna de unos a la matriz ya normalizada
+
+    print(X_n)
+    print(Y_n)
+
+    print(mu)
+    print(sigma)
+
+
+    
+
+
+def descenso_gradiente_varias_variables():
+    borrarEstaLineaDeCodigo = True
+
+    
+
+
+            
 
 
 
-resuelve_problema()
+resuelve_problema_regresion_varias_variables()
 
