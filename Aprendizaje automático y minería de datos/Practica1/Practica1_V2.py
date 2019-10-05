@@ -123,9 +123,11 @@ def descenso_gradiente_multiple_variable(X, Y, alpha):
     #construimos matriz Z
     th0 = 0.0
     th1 = 0.0
+    th_n = 0.0
 
-    Z = np.array([th0 ,th1])
-    #z debe tener la misma dimensión que el numero de parámetos que vamos a tener, es decir, shape(X) - 1
+    Z = np.zeros(X.shape[1])
+
+    Z_ = np.zeros(X.shape[1] - 1)
 
     alpha_m = (alpha/m)
 
@@ -141,23 +143,26 @@ def descenso_gradiente_multiple_variable(X, Y, alpha):
         th0 -= alpha_m * sum1_
 
         #Calculo Theta 1, 2, 3 ... n
-        #Sumatorio para el calculo de Theta1
+        #Sumatorio para el calculo de Thetan
         for k in range(X.shape[1] - 1):
             sum2 =  (H_Theta(X, Z) - Y) * X[:, k + 1]
             sum2_ = sum2.sum()
-        
+            th_n -= alpha_m * sum2_ #vamos calculando cada uno de los thn
+            Z_[k] = th_n #almacenamos los thn calculados en un vector provisional
 
-        th1 -= alpha_m * sum2_
 
+        #Actualizamos los nuevos thetas del vector Z    
         Z[0] = th0
-        Z[1] = th1
+    
+        for p in range(X.shape[1]-1):
+            Z[p+1] = Z_[p]
 
         
-        Thetas = np.append(Thetas, [[th0, th1]], axis= 0)
+        Thetas = np.append(Thetas, [Z], axis= 0)
 
         #funcion de costes
         J = funcion_coste(X,Y, Z)
-
+        
         Costes = np.append(Costes, [J], axis = 0)
 
     return Thetas, Costes
