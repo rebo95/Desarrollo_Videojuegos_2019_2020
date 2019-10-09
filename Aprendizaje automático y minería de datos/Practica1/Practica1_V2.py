@@ -25,7 +25,7 @@ def pinta_costes(X, Y, num_div = 100):
 
     xx_thetas0, yy_thetas1 = np.meshgrid(x_theta0, y_theta1) #junta las matrices que servirán de ejes para nuestra representación de lls datos
     
-    dim_0 = xx_thetas0.shape[0]
+    dim_0 = xx_thetas0.shape[0] 
     dim_1 = xx_thetas0.shape[1]
 
     J = np.zeros((dim_0, dim_1)) #contiene la matriz J de costes asociados a cada par de thetas introducidos, cada coste se almacena en una matriz coincidiendo con el valor de fila y columna del que se extrageron sus parametros para ser calculado
@@ -131,7 +131,7 @@ def descenso_gradiente_multiple_variable(X, Y, alpha):
 
     alpha_m = (alpha/m)
 
-    Thetas = np.array([[th0, th1]]) #almacena los thetas que forman parte de la hipotesis h_theta
+    Thetas = np.array([Z]) #almacena los thetas que forman parte de la hipotesis h_theta
     Costes = np.array([]) #almacena los costes obtenidos durante el descenso de gradiente
  
     for i in range(1500):
@@ -157,13 +157,14 @@ def descenso_gradiente_multiple_variable(X, Y, alpha):
         for p in range(X.shape[1]-1):
             Z[p+1] = Z_[p]
 
-        
         Thetas = np.append(Thetas, [Z], axis= 0)
 
         #funcion de costes
         J = funcion_coste(X,Y, Z)
         
         Costes = np.append(Costes, [J], axis = 0)
+
+        print (J)
 
     return Thetas, Costes
 
@@ -203,6 +204,7 @@ def resuelve_problema_regresion_varias_variables():
 
     X_normalizada = np.hstack([np.ones([X_shape_1, 1]), X_normalizada]) #le añadimos la columna de unos a la matriz ya normalizada
 
+    Thetas, Costes = descenso_gradiente_multiple_variable(X_normalizada, Y, alpha = 0.01)
 
 
 def descenso_gradiente_varias_variables():
