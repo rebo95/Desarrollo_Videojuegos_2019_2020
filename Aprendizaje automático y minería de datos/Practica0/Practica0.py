@@ -84,7 +84,6 @@ def points_behind_function_area(fun, a, b, num_points, function_maximum):
         if fun(x_value_area_point) > y_value_area_point:
             points_inside_area += 1
 
-
     return points_inside_area
 
 
@@ -102,8 +101,10 @@ def integra_mc(fun, a, b, num_points):
     toc = time.process_time()
     fun_time =  1000 * (toc-tic)
 
+
     print("Area using loops : ", area_calculator(a, b, num_points, points_inside_area, max_value))
     print("Time using loops : ", fun_time) 
+
 
     return fun_time
 

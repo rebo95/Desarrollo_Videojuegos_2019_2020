@@ -87,6 +87,15 @@ def normalEcuation(X,Y): #nos da los valores de theta que mejor se ajustan a nue
 
     return thetas
 
+def draw_function(costes, iteraciones):
+   
+    x_axis = np.linspace(0, iteraciones, iteraciones)
+
+
+    plt.figure()
+    plt.scatter(x_axis, costes, c = 'blue', label = 'loops' )
+    plt.legend()
+    plt.show()
 
 def descenso_gradiente(X, Y, alpha):
     
@@ -151,7 +160,6 @@ def resuelve_problema_regresion_una_variable():
 
     Thetas, Costes = descenso_gradiente(X_, Y_, alpha = 0.01)
 
-    
     plt.scatter(np.array(X_[:,1]), Y_, alpha= 0.5)
     plt.plot([5, 22], [hth(5,Thetas[-1]) , hth(22, Thetas[-1])], color = "red")
     plt.show()
@@ -181,8 +189,9 @@ def resuelve_problema_regresion_varias_variables():
     Thetas, Costes = descenso_gradiente(X_normalizada, Y, 0.0025) #los valores de theta aquí son los obtenidos normalizando la matriz, esto es, necesitamos "desnormalizarlos"
     Thetas_normal_Ecuation = normalEcuation(X, Y)
 
-
-
+    #Representación de como avanza la función de costes en funcion
+    draw_function(Costes, 1500)
+    
 
     #testeo_predicción_de_precios_descensoDeGradiente-VS-EcuacionNormal
 
@@ -199,13 +208,6 @@ def resuelve_problema_regresion_varias_variables():
     print("Prediccion gradiente descendiente", prediccion_gradiente_descendiente)
 
 
-
-
-
-    
-
-
-            
 
 
 #resuelve_problema_regresion_una_variable()
