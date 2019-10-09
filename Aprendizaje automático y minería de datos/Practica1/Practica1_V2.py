@@ -18,6 +18,7 @@ def hth(x, th): #Hipótesis modelo lineal
 def H_Theta(X, Z): #Hipótesis del mocelo lineal vectorizada 
     return np.dot(X, Z)
 
+
 def pinta_costes(X, Y, num_div = 100):
 
     x_theta0 = np.linspace(-10, 10 ,num_div)
@@ -70,53 +71,24 @@ def funcion_coste(X, Y, Theta): #funcion de costes vectorizada
     return sumatory
 
 
+def normalEcuation(X,Y): #nos da los valores de theta que mejor se ajustan a nuestra regresión lineal
+
+    #theta = (XT * X)**-1 * XT * Y 
+
+    XT = np.transpose(X)
+
+    XT__X = np.matmul(XT, X)
+
+    XT__X_Inv = np.linalg.pinv(XT__X, rcond = 10**(-15))
+
+    XT__X_Inv__XT = np.matmul(XT__X_Inv, XT)
+
+    thetas = np.matmul(XT__X_Inv__XT, Y)
+
+    return thetas
+
+
 def descenso_gradiente(X, Y, alpha):
-    
-    m = len(X)
-
-    #construimos matriz Z
-    th0 = 0.0
-    th1 = 0.0
-
-    Z = np.array([th0 ,th1])
-
-    alpha_m = (alpha/m)
-
-    Thetas = np.array([[th0, th1]]) #almacena los thetas que forman parte de la hipotesis h_theta
-    Costes = np.array([]) #almacena los costes obtenidos durante el descenso de gradiente
-
-    X_aux = np.array(X[:,1])
- 
-    for i in range(1500):
-
-        #Calculo de Theta 0
-        #Sumatorio para el calculo de Theta0
-        sum1 = H_Theta(X, Z) - Y
-        sum1_ = sum1.sum()
-
-        #Calculo Theta 1
-        #Sumatorio para el calculo de Theta1
-        sum2 =  (H_Theta(X, Z) - Y) * X_aux
-        sum2_ = sum2.sum()
-        
-        th0 -= alpha_m * sum1_
-        th1 -= alpha_m * sum2_
-
-        Z[0] = th0
-        Z[1] = th1
-
-        
-        Thetas = np.append(Thetas, [[th0, th1]], axis= 0)
-
-        #funcion de costes
-        J = funcion_coste(X,Y, Z)
-
-        Costes = np.append(Costes, [J], axis = 0)
-
-    return Thetas, Costes
-
-
-def descenso_gradiente_multiple_variable(X, Y, alpha):
     
     m = len(X)
 
@@ -161,10 +133,8 @@ def descenso_gradiente_multiple_variable(X, Y, alpha):
 
         #funcion de costes
         J = funcion_coste(X,Y, Z)
-        
-        Costes = np.append(Costes, [J], axis = 0)
 
-        print (J)
+        Costes = np.append(Costes, [J], axis = 0)
 
     return Thetas, Costes
 
@@ -179,7 +149,7 @@ def resuelve_problema_regresion_una_variable():
 
     X_ = np.hstack([np.ones([X_m,1]),X_])
 
-    Thetas, Costes = descenso_gradiente_multiple_variable(X_, Y_, alpha = 0.01)
+    Thetas, Costes = descenso_gradiente(X_, Y_, alpha = 0.01)
 
     
     plt.scatter(np.array(X_[:,1]), Y_, alpha= 0.5)
@@ -196,19 +166,41 @@ def resuelve_problema_regresion_varias_variables():
 
     X = poblacion[: , :-1]
     Y = poblacion[: , -1]
-
     
+    
+
     X_normalizada, mu, sigma = normaliza(X)
 
+
+    X = np.hstack([np.ones([np.shape(X)[0], 1]), X])
     X_shape_1 = np.shape(X_normalizada)[0]
+
 
     X_normalizada = np.hstack([np.ones([X_shape_1, 1]), X_normalizada]) #le añadimos la columna de unos a la matriz ya normalizada
 
-    Thetas, Costes = descenso_gradiente_multiple_variable(X_normalizada, Y, alpha = 0.01)
+    Thetas, Costes = descenso_gradiente(X_normalizada, Y, 0.0025) #los valores de theta aquí son los obtenidos normalizando la matriz, esto es, necesitamos "desnormalizarlos"
+    Thetas_normal_Ecuation = normalEcuation(X, Y)
 
 
-def descenso_gradiente_varias_variables():
-    borrarEstaLineaDeCodigo = True
+
+
+    #testeo_predicción_de_precios_descensoDeGradiente-VS-EcuacionNormal
+
+    #Normalizamos la entrada para el caso de gradiente descendiente con los valores de sigma y mu que obteníamos de normalizar la matriz de entrada original
+    precio_test_normalizado = (1650 - mu[0])/sigma[0]
+    habitaciones_test_normalizado = (3 - mu[1])/sigma[1]
+
+    shape_thetas = np.shape(Thetas)[0]-1
+
+    prediccion_normal_ecuation = H_Theta([[1.0, 1650, 3]] ,Thetas_normal_Ecuation)
+    prediccion_gradiente_descendiente = H_Theta([[1.0, precio_test_normalizado, habitaciones_test_normalizado]], Thetas[shape_thetas])
+
+    print("Prediccion ecuación normal " , prediccion_normal_ecuation)
+    print("Prediccion gradiente descendiente", prediccion_gradiente_descendiente)
+
+
+
+
 
     
 
@@ -216,6 +208,6 @@ def descenso_gradiente_varias_variables():
             
 
 
-resuelve_problema_regresion_una_variable()
-#resuelve_problema_regresion_varias_variables()
+#resuelve_problema_regresion_una_variable()
+resuelve_problema_regresion_varias_variables()
 
