@@ -25,8 +25,10 @@ def pinta_recta_regresion_lineal(X ,Y ,x1 , x2, thetas):
 
 def pinta_costes(X, Y, num_div = 100):
 
-    x_theta0 = np.linspace(-10, 10 ,num_div)
-    y_theta1 = np.linspace(-1, 4, num_div)
+    step = 0.1
+    
+    x_theta0 = np.arange(-10, 10 ,step)
+    y_theta1 = np.arange(-1, 4, step)
 
     xx_thetas0, yy_thetas1 = np.meshgrid(x_theta0, y_theta1) #junta las matrices que servirán de ejes para nuestra representación de lls datos
     
@@ -189,7 +191,7 @@ def resuelve_problema_regresion_varias_variables():
 
     X_normalizada = np.hstack([np.ones([X_shape_1, 1]), X_normalizada]) #le añadimos la columna de unos a la matriz ya normalizada
 
-    Thetas, Costes = descenso_gradiente(X_normalizada, Y, 0.0022) #los valores de theta aquí son los obtenidos normalizando la matriz, esto es, necesitamos "desnormalizarlos"
+    Thetas, Costes = descenso_gradiente(X_normalizada, Y, 0.01) #los valores de theta aquí son los obtenidos normalizando la matriz, esto es, necesitamos "desnormalizarlos"
     Thetas_normal_Ecuation = normalEcuation(X, Y)
 
     #Representación de como avanza la función de costes en funcion
@@ -213,6 +215,6 @@ def resuelve_problema_regresion_varias_variables():
 
 
 
-#resuelve_problema_regresion_una_variable()
-resuelve_problema_regresion_varias_variables()
+resuelve_problema_regresion_una_variable()
+#resuelve_problema_regresion_varias_variables()
 
