@@ -18,6 +18,10 @@ def hth(x, th): #Hipótesis modelo lineal
 def H_Theta(X, Z): #Hipótesis del mocelo lineal vectorizada 
     return np.dot(X, Z)
 
+def pinta_recta_regresion_lineal(X ,Y ,x1 , x2, thetas):
+    plt.scatter(np.array(X[:,1]), Y, alpha= 0.5)
+    plt.plot([x1, x2], [hth(x1,thetas[-1]) , hth(x2, thetas[-1])], color = "red")
+    plt.show()
 
 def pinta_costes(X, Y, num_div = 100):
 
@@ -48,7 +52,7 @@ def pinta_costes(X, Y, num_div = 100):
     plt.contour(xx_thetas0, yy_thetas1, J, np.logspace(-2, 3, 20), colors = "blue")
     plt.show()
 
-def normaliza(X): #Se entiende que se deben normalizar todos los atributos de la matriz ponlación
+def normaliza(X):
 
     X_normalizada = np.zeros((X.shape[0], X.shape[1]))
 
@@ -90,7 +94,6 @@ def normalEcuation(X,Y): #nos da los valores de theta que mejor se ajustan a nue
 def draw_function(costes, iteraciones):
    
     x_axis = np.linspace(0, iteraciones, iteraciones)
-
 
     plt.figure()
     plt.scatter(x_axis, costes, c = 'blue', label = 'loops' )
@@ -160,11 +163,11 @@ def resuelve_problema_regresion_una_variable():
 
     Thetas, Costes = descenso_gradiente(X_, Y_, alpha = 0.01)
 
-    plt.scatter(np.array(X_[:,1]), Y_, alpha= 0.5)
-    plt.plot([5, 22], [hth(5,Thetas[-1]) , hth(22, Thetas[-1])], color = "red")
-    plt.show()
-    
 
+    #Pinta la recta de regresión lineal que mejor se ajusta a los datos de entrenamiento
+    pinta_recta_regresion_lineal(X_ , Y_, 5, 22, Thetas)
+
+    #Pinta las gráficas de contorno
     pinta_costes(X_, Y_)
 
 
