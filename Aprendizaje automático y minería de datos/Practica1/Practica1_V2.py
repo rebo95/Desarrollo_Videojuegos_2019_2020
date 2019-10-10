@@ -59,7 +59,7 @@ def normaliza(X):
     mu = np.zeros(X.shape[1])
     sigma = np.zeros(X.shape[1])
     
-    np.median(X, axis = 0, out = mu)
+    np.mean(X, axis = 0, out = mu)
     np.std(X, axis = 0, out = sigma)
 
     for i in range(X.shape[0]):
@@ -189,7 +189,7 @@ def resuelve_problema_regresion_varias_variables():
 
     X_normalizada = np.hstack([np.ones([X_shape_1, 1]), X_normalizada]) #le añadimos la columna de unos a la matriz ya normalizada
 
-    Thetas, Costes = descenso_gradiente(X_normalizada, Y, 0.0025) #los valores de theta aquí son los obtenidos normalizando la matriz, esto es, necesitamos "desnormalizarlos"
+    Thetas, Costes = descenso_gradiente(X_normalizada, Y, 0.0022) #los valores de theta aquí son los obtenidos normalizando la matriz, esto es, necesitamos "desnormalizarlos"
     Thetas_normal_Ecuation = normalEcuation(X, Y)
 
     #Representación de como avanza la función de costes en funcion
