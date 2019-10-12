@@ -35,14 +35,93 @@ def sigmoide_function(X):
 
     sigmoide = 1/(1 + e_z)
 
-    print(sigmoide)
+    return sigmoide
 
+
+def ones_matrix(X):
+
+    return np.zeros(X.shape) + 1
 
 def solve_problem():
 
     X_, Y_ = data_builder(data_csv("ex2data1.csv"))
-
     data_visualization(X_, Y_)
 
+    X_V = X_ #X_ that will be used for use in vectorized methods, with the addition of a collum of ones as the first group of atributes
+    
+    X_m = np.shape(X_)[0]
 
-sigmoide_function([[2,2], [2,2]])
+    X_V = np.hstack([np.ones([X_m,1]),X_]) #adding the one collum
+    Thetas = np.zeros(X_V.shape[1])
+
+
+    cost_ = cost(X_V, Y_, Thetas)
+    gradient_ = gradient(X_V, Y_, Thetas)
+
+    print(gradient_)
+
+    
+
+
+def cost(X, Y, Thetas):
+
+    m = X.shape[0]
+
+    #J(θ) = −(1/m) * (A + B * C)
+    #J(θ) = −(1/m) * ((log (g(Xθ)))T * y + (log (1 − g(Xθ)))T * (1 − y))
+
+    #A
+    X_Teta = np.dot(X, Thetas)
+    g_X_Thetas = sigmoide_function(X_Teta)
+    log_g_X_Thetas = np.log(g_X_Thetas)
+    T_log_g_X_Thetas = np.transpose(log_g_X_Thetas)
+    y_T_log_g_X_Thetas = np.dot(T_log_g_X_Thetas, Y)
+
+    A = y_T_log_g_X_Thetas
+
+    #B
+    one_g_X_Thetas = ones_matrix(g_X_Thetas) - g_X_Thetas
+    log_one_g_X_Thetas = np.log(one_g_X_Thetas)
+    T_log_one_g_X_Thetas = np.transpose(log_one_g_X_Thetas)
+
+    B = T_log_one_g_X_Thetas
+
+    #C
+    C = ones_matrix(g_X_Thetas) - Y
+
+    J = (-1/m) * (A + (np.dot(B, C)))
+
+
+    return J
+
+
+def gradient(X, Y, Thetas):
+
+    m = X.shape[0]
+
+    X_Teta = np.dot(X, Thetas)
+    g_X_Thetas = sigmoide_function(X_Teta)
+
+    X_T = np.transpose(X)
+
+    gradient = (1/m)*(np.dot(X_T, g_X_Thetas - Y ))
+
+    return gradient
+
+
+
+
+
+
+
+
+
+
+def test():
+    mat = np.array([[1,math.e,3],[math.e,2,1]])
+    Y = np.log(mat)
+    print(Y)
+
+solve_problem()
+
+

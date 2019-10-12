@@ -104,7 +104,7 @@ def draw_function(costes, iteraciones):
 
 def descenso_gradiente(X, Y, alpha):
     
-    m = len(X)
+    m = X.shape[0]
 
     #construimos matriz Z
     th0 = 0.0
