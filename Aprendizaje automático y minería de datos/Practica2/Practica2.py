@@ -4,6 +4,9 @@ import math
 from math import e
 from pandas.io.parsers import read_csv
 
+import scipy.optimize as opt
+
+
 def data_csv(file_name):
     "Takes the data from the csv file and tranfers it to a numpy array"
 
@@ -28,6 +31,9 @@ def data_visualization(X, Y):
 
     plt.show()
 
+def ones_matrix(X):
+
+    return np.zeros(X.shape) + 1
 
 def sigmoide_function(X):
 
@@ -37,36 +43,9 @@ def sigmoide_function(X):
 
     return sigmoide
 
+def cost(Thetas, X, Y):
 
-def ones_matrix(X):
-
-    return np.zeros(X.shape) + 1
-
-def solve_problem():
-
-    X_, Y_ = data_builder(data_csv("ex2data1.csv"))
-    data_visualization(X_, Y_)
-
-    X_V = X_ #X_ that will be used for use in vectorized methods, with the addition of a collum of ones as the first group of atributes
-    
-    X_m = np.shape(X_)[0]
-
-    X_V = np.hstack([np.ones([X_m,1]),X_]) #adding the one collum
-    Thetas = np.zeros(X_V.shape[1])
-
-
-    cost_ = cost(X_V, Y_, Thetas)
-    gradient_ = gradient(X_V, Y_, Thetas)
-
-    print(gradient_)
-
-    
-
-
-def cost(X, Y, Thetas):
-
-    m = X.shape[0]
-
+    m = X.shape[0] 
     #J(θ) = −(1/m) * (A + B * C)
     #J(θ) = −(1/m) * ((log (g(Xθ)))T * y + (log (1 − g(Xθ)))T * (1 − y))
 
@@ -95,7 +74,7 @@ def cost(X, Y, Thetas):
     return J
 
 
-def gradient(X, Y, Thetas):
+def gradient(Thetas, X, Y):
 
     m = X.shape[0]
 
@@ -107,6 +86,50 @@ def gradient(X, Y, Thetas):
     gradient = (1/m)*(np.dot(X_T, g_X_Thetas - Y ))
 
     return gradient
+
+
+def optimized_parameters(Thetas, X, Y):
+
+    result = opt.fmin_tnc(func = cost, x0 = Thetas, fprime = gradient, args = (X, Y) )
+    theta_opt = result[0]
+
+    return theta_opt
+
+
+def solve_problem():
+
+    X_, Y_ = data_builder(data_csv("ex2data1.csv"))
+    data_visualization(X_, Y_)
+
+    X_V = X_ #X_ that will be used for use in vectorized methods, with the addition of a collum of ones as the first group of atributes
+
+    X_m = np.shape(X_)[0]
+
+    X_V = np.hstack([np.ones([X_m,1]),X_]) #adding the one collum
+
+    Thetas = np.zeros(X_V.shape[1])
+
+    cost_ = cost(Thetas, X_V, Y_)
+    gradient_ = gradient(Thetas, X_V, Y_)
+
+    print(cost_)
+    print(gradient_)
+
+    result = optimized_parameters(Thetas, X_V, Y_)
+    print(result)
+
+    cost_ = cost(result, X_V, Y_)
+    print("Coste optimo ", cost_)
+
+
+
+
+
+
+    
+
+
+
 
 
 
