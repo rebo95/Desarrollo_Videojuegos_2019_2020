@@ -31,9 +31,26 @@ def data_visualization(X, Y):
 
     plt.show()
 
+def draw_frontier(X, Y, Thetas):
+
+    plt.figure()
+    x1_min, x1_max = X[:, 0].min(), X[:, 0].max()
+    x2_min, x2_max = X[:, 1].min(), X[:, 1].max()
+
+    xx1, xx2 = np.meshgrid(np.linspace(x1_min, x1_max), np.linspace(x2_min, x2_max))
+
+    h = sigmoide_function(np.c_[np.ones((xx1.ravel().shape[0], 1)), xx1.ravel(), xx2.ravel()].dot(Thetas))
+    h = h.reshape(xx1.shape)
+
+    plt.contour(xx1, xx2, h, [0.5], linewidths=1, colors='b')
+    
+
 def ones_matrix(X):
 
     return np.zeros(X.shape) + 1
+
+def H(X, Z): #Hipótesis del mocelo lineal vectorizada 
+    return np.dot(X, Z)
 
 def sigmoide_function(X):
 
@@ -95,11 +112,26 @@ def optimized_parameters(Thetas, X, Y):
 
     return theta_opt
 
+def logistic_regresion_evaluation(X, Y, Z):
+
+    H_ = H(X, Z)
+    H_sigmoid = sigmoide_function(H_)
+
+    H_sigmoid_evaluated = (H_sigmoid >= 0.5).astype(np.float) #every value that keeps the condition will return true. astyping it to int it will turn it into a one value, having an array ready to compare with Y_
+    
+    comparison_array = H_sigmoid_evaluated == Y #returns an array where each value will be true if the condition is keeped
+
+    coincidences = comparison_array[comparison_array == True] #return an array with only the elements that keep the condition from the original array
+
+    percentage_correct_clasification = (coincidences.shape[0] / comparison_array.shape[0]) * 100.0 #how many trues(coincidences) do we have in comparison with all the succesful and not succesful coincidences (trues/(trues+falses))
+
+    return(percentage_correct_clasification)
+    
 
 def solve_problem():
 
     X_, Y_ = data_builder(data_csv("ex2data1.csv"))
-    data_visualization(X_, Y_)
+    
 
     X_V = X_ #X_ that will be used for use in vectorized methods, with the addition of a collum of ones as the first group of atributes
 
@@ -112,14 +144,28 @@ def solve_problem():
     cost_ = cost(Thetas, X_V, Y_)
     gradient_ = gradient(Thetas, X_V, Y_)
 
+
+
+
+    #testing and comparing if the resoults are correct having in mind the resoults given in the assignment document
     print(cost_)
     print(gradient_)
 
-    result = optimized_parameters(Thetas, X_V, Y_)
-    print(result)
 
-    cost_ = cost(result, X_V, Y_)
-    print("Coste optimo ", cost_)
+    optimized_thetas = optimized_parameters(Thetas, X_V, Y_)#Optimus cost is obtained by calling the cost ecuation using the optimized thetas
+
+
+    print("Thetas optimos: ", optimized_thetas)
+    cost_ = cost(optimized_thetas, X_V, Y_)
+    print("Coste optimo : ", cost_)
+
+
+    percentage_correct_clasification = logistic_regresion_evaluation(X_V, Y_, optimized_thetas)
+
+    print("Porcentaje de acierto : ", percentage_correct_clasification)
+
+    draw_frontier(X_, Y_, optimized_thetas )
+    data_visualization(X_, Y_)
 
 
 

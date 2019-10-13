@@ -111,7 +111,7 @@ def descenso_gradiente(X, Y, alpha):
     th1 = 0.0
     th_n = 0.0
 
-    Z = np.zeros(X.shape[1])
+    Z = np.zeros(X.shape[1]) #estamos tomando la dimensión de la X con la columna de 1, de tal manera que esta si coincide con el valor de ladimension que tiene que tener el vector de thetas
 
     Z_ = np.zeros(X.shape[1] - 1)
 
@@ -131,7 +131,7 @@ def descenso_gradiente(X, Y, alpha):
         #Calculo Theta 1, 2, 3 ... n
         #Sumatorio para el calculo de Thetan
         for k in range(X.shape[1] - 1):
-            sum2 =  (H_Theta(X, Z) - Y) * X[:, k + 1]
+            sum2 =  (H_Theta(X, Z) - Y) * X[:, k + 1] # sería interesante ver cual es el resultado de probar con el uso de dot en vez del producto valor a valor
             sum2_ = sum2.sum()
             th_n -= alpha_m * sum2_ #vamos calculando cada uno de los thn
             Z_[k] = th_n #almacenamos los thn calculados en un vector provisional
