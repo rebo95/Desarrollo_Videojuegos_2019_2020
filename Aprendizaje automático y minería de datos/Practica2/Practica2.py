@@ -215,7 +215,7 @@ def logistic_regresion():
     data_visualization(X_, Y_)
     
 
-def regularized_logistic_regresion():
+def regularized_logistic_regresion(h = 1):
 
     X_, Y_ = data_builder(data_csv("ex2data2.csv"))
     
@@ -225,7 +225,6 @@ def regularized_logistic_regresion():
 
     #theta and alpha inicialization
     Thetas = np.zeros(X_poly.shape[1])
-    h = 1
 
     cost_r = cost_regularized(Thetas, X_poly, Y_, h)
     gradient_r = gradient_regularized(Thetas, X_poly, Y_, h)
