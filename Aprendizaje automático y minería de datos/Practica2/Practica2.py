@@ -7,6 +7,9 @@ from pandas.io.parsers import read_csv
 import scipy.optimize as opt
 from sklearn.preprocessing import PolynomialFeatures
 
+from matplotlib import cm
+from matplotlib.ticker import LinearLocator, FormatStrFormatter
+from mpl_toolkits.mplot3d import Axes3D
 
 def data_csv(file_name):
     "Takes the data from the csv file and tranfers it to a numpy array"
@@ -45,6 +48,27 @@ def draw_frontier(X, Y, Thetas):
 
     plt.contour(xx1, xx2, h, [0.5], linewidths=1, colors='b')
 
+    data_visualization(X, Y)
+
+def draw_frontier_3D(X, Y, Thetas):
+
+    
+    x1_min, x1_max = X[:, 0].min(), X[:, 0].max()
+    x2_min, x2_max = X[:, 1].min(), X[:, 1].max()
+
+    xx1, xx2 = np.meshgrid(np.linspace(x1_min, x1_max), np.linspace(x2_min, x2_max))
+
+    h = sigmoide_function(np.c_[np.ones((xx1.ravel().shape[0], 1)), xx1.ravel(), xx2.ravel()].dot(Thetas))
+    h = h.reshape(xx1.shape)
+
+    fig = plt.figure()
+    ax = Axes3D(fig)
+    surf = ax.plot_surface(xx1, xx2, h, cmap= cm.coolwarm, linewidths= 0, antialiaseds = False)
+    fig.colorbar(surf, shrink = 0.5, aspect = 5)
+    plt.show()
+
+
+
 def draw_frontier_regularized(X, Y, Theta, poly):
 
     plt.figure()
@@ -55,6 +79,24 @@ def draw_frontier_regularized(X, Y, Theta, poly):
     h = sigmoide_function(poly.fit_transform(np.c_[xx1.ravel(), xx2.ravel()]).dot(Theta))
     h = h.reshape(xx1.shape)
     plt.contour(xx1, xx2, h, [0.5], linewidths=1, colors='g')
+
+    data_visualization(X, Y)
+
+def draw_frontier_regularized_3D(X, Y, Theta, poly):
+
+    x1_min, x1_max = X[:, 0].min(), X[:, 0].max()
+    x2_min, x2_max = X[:, 1].min(), X[:, 1].max()
+    xx1, xx2 = np.meshgrid(np.linspace(x1_min, x1_max), np.linspace(x2_min, x2_max))
+
+    h = sigmoide_function(poly.fit_transform(np.c_[xx1.ravel(), xx2.ravel()]).dot(Theta))
+    h = h.reshape(xx1.shape)
+
+    fig = plt.figure()
+    ax = Axes3D(fig)
+    surf = ax.plot_surface(xx1, xx2, h, cmap= cm.coolwarm, linewidths= 0, antialiaseds = False)
+    fig.colorbar(surf, shrink = 0.5, aspect = 5)
+    plt.show()
+
 
     
 
@@ -212,7 +254,8 @@ def logistic_regresion():
     print("Porcentaje de acierto : ", percentage_correct_clasification)
 
     draw_frontier(X_, Y_, optimized_thetas )
-    data_visualization(X_, Y_)
+    draw_frontier_3D(X_, Y_, optimized_thetas )
+    
     
 
 def regularized_logistic_regresion(h = 1):
@@ -234,7 +277,8 @@ def regularized_logistic_regresion(h = 1):
     optimized_thetas_regularized = optimized_parameters_regularized(Thetas, X_poly, Y_, h)
 
     draw_frontier_regularized(X_, Y_, optimized_thetas_regularized, poly )
-    data_visualization(X_, Y_)
+    draw_frontier_regularized_3D(X_, Y_, optimized_thetas_regularized, poly )
+    
 
 
 def test():
@@ -242,7 +286,7 @@ def test():
     mat = two_power(mat)
     print(mat)
 
-
+logistic_regresion()
 regularized_logistic_regresion()
 
 
