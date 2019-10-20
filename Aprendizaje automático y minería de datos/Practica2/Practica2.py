@@ -262,10 +262,9 @@ def regularized_logistic_regresion(h = 1):
 
     X_, Y_ = data_builder(data_csv("ex2data2.csv"))
     
-    
     poly = PolynomialFeatures(degree=6)
     X_poly = poly.fit_transform(X_)
-
+    
     #theta and alpha inicialization
     Thetas = np.zeros(X_poly.shape[1])
 
