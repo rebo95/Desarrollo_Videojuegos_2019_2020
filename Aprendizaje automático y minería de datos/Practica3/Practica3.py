@@ -120,15 +120,36 @@ def optimized_parameters_regularized(Thetas, X, Y, reg):
 
     result = opt.fmin_tnc(func = cost_regularized, x0 = Thetas, fprime = gradient_regularized, args = (X, Y, reg) )
     theta_opt = result[0]
-
+    print('r = ' , theta_opt)
     return theta_opt
 
 
 def oneVsAll(X, y, num_etiquetas, reg, Thetas):
 
-    #Theta = np.zeros([num_etiquetas ,X.shape[1]]) #contains the thetas of each case or clase, row 0 have the values for the first number, row two for the second ...
-    Thetas_ = optimized_parameters_regularized(Thetas, X, y, 1)
+    y_= (y == 10).astype(np.int)
+    Thetas_ = optimized_parameters_regularized(Thetas, X, y_, reg)
 
+    optimiced_parameters_matrix = Thetas_
+
+    for i in range(1, num_etiquetas):
+        y_ = (y == i).astype(np.int)
+        Thetas_ = optimized_parameters_regularized(Thetas, X, y_, reg)
+        optimiced_parameters_matrix = np.vstack((optimiced_parameters_matrix, Thetas_))
+    
+    #TENGO QUE IR TRANSFORMANDO LA REGRESION LOGÍSTICA PARA LOS VALORES DE Y DE TAL MANERA QUE HAY 1 DONDE COINCIDE CON EL VALOR DEL NUMERO REPRESENTADO Y 0 EN EL RESTO 
+    #PARA EL VALOR DE 2 POR EJEMPLO TENDRIAMOS UNA Y DE [0 0 1 0 0 0 0 0 0 0 ]
+    #PARA EL VALOR DE 5 POR EJEMPLO TENDRIAMOS UNA Y DE [0 0 0 0 0 1 0 0 0 0 ]
+    #SIGMOIDE MAXIMO ES EL QUE ESTÁ MAS SEGURO DE LA SALIDA LO QUE IMPLICA QUE SE REFIERE A ESE NUMERO NESIMO CON LOS VALORES DE PESOS DE LA MATRIZ
+
+def hipothesis_value(X, y, num_etiquetas, reg, Thetas_matrix):
+
+    training_sample_dimension = X.shape[0]//num_etiquetas
+
+    X_ = X[0:training_sample_dimension, :]
+    y_ = y[0:training_sample_dimension ]
+
+    #H_ = H(X_, Z_)
+    #H_sigmoid = g_z(H_)
 
 def main():
 
@@ -139,7 +160,11 @@ def main():
 
     Thetas = np.zeros(X.shape[1])
 
-    oneVsAll(X, y, 10, reg, Thetas)
+    X_ones = np.hstack([np.ones([X.shape[0],1]),X]) #adding the one collum
+
+    #oneVsAll(X, y, 10, reg, Thetas)
+
+    hipothesis_value(X, y, 10, 1, Thetas)
 
 
 
