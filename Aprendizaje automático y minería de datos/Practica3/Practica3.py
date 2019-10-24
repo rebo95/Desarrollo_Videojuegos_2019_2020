@@ -152,11 +152,12 @@ def all_samples_comparator(X, y, num_etiquetas, Thetas_matrix):
     samples = X.shape[0]
     y_ = np.zeros(samples)
 
+    y = np.where(y == 10, 0, y)
+    print(y)
+
     for i in range(samples):
         y_[i] = Comparator(X[i, :], num_etiquetas, Thetas_matrix)
 
-    
-    print(y_)
 
 
 def Comparator(X, num_etiquetas, Thetas_matrix):
