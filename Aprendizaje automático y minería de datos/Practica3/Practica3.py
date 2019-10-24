@@ -9,6 +9,9 @@ from pandas.io.parsers import read_csv
 import scipy.optimize as opt
 from sklearn.preprocessing import PolynomialFeatures
 
+import sys 
+
+
 
 def load_data(file_name):
     data = loadmat(file_name)
@@ -120,7 +123,7 @@ def optimized_parameters_regularized(Thetas, X, Y, reg):
 
     result = opt.fmin_tnc(func = cost_regularized, x0 = Thetas, fprime = gradient_regularized, args = (X, Y, reg) )
     theta_opt = result[0]
-    print('r = ' , theta_opt)
+
     return theta_opt
 
 
@@ -136,20 +139,64 @@ def oneVsAll(X, y, num_etiquetas, reg, Thetas):
         Thetas_ = optimized_parameters_regularized(Thetas, X, y_, reg)
         optimiced_parameters_matrix = np.vstack((optimiced_parameters_matrix, Thetas_))
     
+    
+    return optimiced_parameters_matrix
     #TENGO QUE IR TRANSFORMANDO LA REGRESION LOGÍSTICA PARA LOS VALORES DE Y DE TAL MANERA QUE HAY 1 DONDE COINCIDE CON EL VALOR DEL NUMERO REPRESENTADO Y 0 EN EL RESTO 
     #PARA EL VALOR DE 2 POR EJEMPLO TENDRIAMOS UNA Y DE [0 0 1 0 0 0 0 0 0 0 ]
     #PARA EL VALOR DE 5 POR EJEMPLO TENDRIAMOS UNA Y DE [0 0 0 0 0 1 0 0 0 0 ]
     #SIGMOIDE MAXIMO ES EL QUE ESTÁ MAS SEGURO DE LA SALIDA LO QUE IMPLICA QUE SE REFIERE A ESE NUMERO NESIMO CON LOS VALORES DE PESOS DE LA MATRIZ
 
+np.set_printoptions(threshold=sys.maxsize)
 def hipothesis_value(X, y, num_etiquetas, reg, Thetas_matrix):
 
     training_sample_dimension = X.shape[0]//num_etiquetas
 
-    X_ = X[0:training_sample_dimension, :]
-    y_ = y[0:training_sample_dimension ]
+    step = 0
 
-    #H_ = H(X_, Z_)
-    #H_sigmoid = g_z(H_)
+    X_ = X[step:training_sample_dimension, :]
+    y_ = y[step:training_sample_dimension ]
+
+    '''
+    for i in range(num_etiquetas):
+        step = training_sample_dimension * i
+        end_step =step + training_sample_dimension
+
+        X_ = X[step:end_step, :]
+        y_ = y[step:end_step ]
+        Z_ = Thetas_matrix[i, :]
+
+        H_ = H(X_, Z_)
+        H_sigmoid = g_z(H_)
+
+        ////////////////////////
+        Z_ = Thetas_matrix[9, :]
+        H_ = H(X, Z_)
+        H_sigmoid = g_z(H_)
+        H_sigmoid_evaluated = (H_sigmoid >= 0.5).astype(np.float)
+    '''
+
+    for j in range(num_etiquetas): #selects the sample to compare or analize within all the training samples 
+
+        step = training_sample_dimension * j
+        end_step = step + training_sample_dimension
+        X_ = X[step:end_step, :]
+
+        for i in range(num_etiquetas): #selects the theta optimized values for each tag or numner, the coincidences or number ones will be greater in the elements that fits with the
+                                        #same number the thetas values represent 
+            Z_ = Thetas_matrix[i, :]
+
+            H_ = H(X_, Z_)
+            H_sigmoid = g_z(H_)
+
+            H_sigmoid_evaluated = (H_sigmoid >= 0.5).astype(np.float)
+
+            ones = sum(map(lambda k : k == True, H_sigmoid_evaluated)) #count the number of elemnets that match the condition in k within the array H_sigmoid_evaluated
+
+            probability = 100 * ones/H_sigmoid_evaluated.shape
+
+            print("Number : ",j ,"Test_value = ", i, "% = ", probability)
+    
+
 
 def main():
 
@@ -158,13 +205,12 @@ def main():
     y, X = load_data("ex3data1")
     #draw_rnd_selection_data(X)
 
-    Thetas = np.zeros(X.shape[1])
-
     X_ones = np.hstack([np.ones([X.shape[0],1]),X]) #adding the one collum
+    Thetas = np.zeros(X_ones.shape[1])
 
-    #oneVsAll(X, y, 10, reg, Thetas)
+    Thetas_matrix = oneVsAll(X_ones, y, 10, reg, Thetas)
 
-    hipothesis_value(X, y, 10, 1, Thetas)
+    hipothesis_value(X_ones, y, 10, 1, Thetas_matrix)
 
 
 
