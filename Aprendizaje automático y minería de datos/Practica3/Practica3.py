@@ -147,61 +147,39 @@ def oneVsAll(X, y, num_etiquetas, reg, Thetas):
     #SIGMOIDE MAXIMO ES EL QUE ESTÁ MAS SEGURO DE LA SALIDA LO QUE IMPLICA QUE SE REFIERE A ESE NUMERO NESIMO CON LOS VALORES DE PESOS DE LA MATRIZ
 
 np.set_printoptions(threshold=sys.maxsize)
-def hipothesis_value(X, y, num_etiquetas, reg, Thetas_matrix):
+def all_samples_comparator(X, y, num_etiquetas, Thetas_matrix):
+    
+    samples = X.shape[0]
+    y_ = np.zeros(samples)
 
-    training_sample_dimension = X.shape[0]//num_etiquetas
+    for i in range(samples):
+        y_[i] = Comparator(X[i, :], num_etiquetas, Thetas_matrix)
 
-    step = 0
+    
+    print(y_)
 
-    X_ = X[step:training_sample_dimension, :]
-    y_ = y[step:training_sample_dimension ]
 
-    '''
-    for i in range(num_etiquetas):
-        step = training_sample_dimension * i
-        end_step =step + training_sample_dimension
+def Comparator(X, num_etiquetas, Thetas_matrix):
 
-        X_ = X[step:end_step, :]
-        y_ = y[step:end_step ]
+    sigmoids = np.zeros(num_etiquetas)
+
+    for i in range(num_etiquetas): #selects the theta optimized values for each tag or numner, the coincidences or number ones will be greater in the elements that fits with the
+                                        #same number the thetas values represent 
         Z_ = Thetas_matrix[i, :]
 
-        H_ = H(X_, Z_)
-        H_sigmoid = g_z(H_)
-
-        ////////////////////////
-        Z_ = Thetas_matrix[9, :]
         H_ = H(X, Z_)
         H_sigmoid = g_z(H_)
-        H_sigmoid_evaluated = (H_sigmoid >= 0.5).astype(np.float)
-    '''
+        sigmoids[i] = H_sigmoid 
 
-    for j in range(num_etiquetas): #selects the sample to compare or analize within all the training samples 
+    tag = np.where(sigmoids == np.amax(sigmoids))
+    num_tag = tag[0]
 
-        step = training_sample_dimension * j
-        end_step = step + training_sample_dimension
-        X_ = X[step:end_step, :]
-
-        for i in range(num_etiquetas): #selects the theta optimized values for each tag or numner, the coincidences or number ones will be greater in the elements that fits with the
-                                        #same number the thetas values represent 
-            Z_ = Thetas_matrix[i, :]
-
-            H_ = H(X_, Z_)
-            H_sigmoid = g_z(H_)
-
-            H_sigmoid_evaluated = (H_sigmoid >= 0.5).astype(np.float)
-
-            ones = sum(map(lambda k : k == True, H_sigmoid_evaluated)) #count the number of elemnets that match the condition in k within the array H_sigmoid_evaluated
-
-            probability = 100 * ones/H_sigmoid_evaluated.shape
-
-            print("Number : ",j ,"Test_value = ", i, "% = ", probability)
-    
-
+    return num_tag
 
 def main():
 
     reg = 1
-
+    num_etiquetas = 10
     y, X = load_data("ex3data1")
     #draw_rnd_selection_data(X)
 
@@ -210,12 +188,14 @@ def main():
 
     Thetas_matrix = oneVsAll(X_ones, y, 10, reg, Thetas)
 
-    hipothesis_value(X_ones, y, 10, 1, Thetas_matrix)
+    all_samples_comparator(X_ones, y, 10, Thetas_matrix)
 
 
+    #X_ = X_ones[4998, :]
+    #num_tag = Comparator(X_, num_etiquetas, Thetas_matrix)
 
-    
-    
+    #print(num_tag)
+
 
 
 main()
