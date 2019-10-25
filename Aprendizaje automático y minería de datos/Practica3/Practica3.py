@@ -151,12 +151,19 @@ def all_samples_comparator(X, y, num_etiquetas, Thetas_matrix):
     
     samples = X.shape[0]
     y_ = np.zeros(samples)
-
     y = np.where(y == 10, 0, y)
-    print(y)
 
     for i in range(samples):
         y_[i] = Comparator(X[i, :], num_etiquetas, Thetas_matrix)
+
+    coincidences_array = y_ == y
+
+    coincidences = sum(map(lambda coincidences_array : coincidences_array == True, coincidences_array  ))
+    percentage =100 * coincidences/coincidences_array.shape
+
+    print(percentage)
+    
+
 
 
 
