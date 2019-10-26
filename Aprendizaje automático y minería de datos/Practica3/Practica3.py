@@ -22,6 +22,14 @@ def load_data(file_name):
 
     return y_2, X
 
+def load_data_neuronal_red(file_name):
+    weights = loadmat(file_name)
+    theta1 , theta2 = weights [ 'Theta1' ] , weights [ 'Theta2' ]
+    print(theta1)
+    print(theta2)
+
+    return theta1, theta2
+
 def draw_rnd_selection_data(X):
     sample = np.random.choice(X.shape[0], 10)
     plt.imshow(X[sample, :].reshape(-1, 20).T)
@@ -146,8 +154,8 @@ def oneVsAll(X, y, num_etiquetas, reg, Thetas):
     #PARA EL VALOR DE 5 POR EJEMPLO TENDRIAMOS UNA Y DE [0 0 0 0 0 1 0 0 0 0 ]
     #SIGMOIDE MAXIMO ES EL QUE ESTÁ MAS SEGURO DE LA SALIDA LO QUE IMPLICA QUE SE REFIERE A ESE NUMERO NESIMO CON LOS VALORES DE PESOS DE LA MATRIZ
 
-np.set_printoptions(threshold=sys.maxsize)
-def all_samples_comparator(X, y, num_etiquetas, Thetas_matrix):
+#np.set_printoptions(threshold=sys.maxsize)
+def all_samples_comparator_percentage(X, y, num_etiquetas, Thetas_matrix):
     
     samples = X.shape[0]
     y_ = np.zeros(samples)
@@ -161,7 +169,7 @@ def all_samples_comparator(X, y, num_etiquetas, Thetas_matrix):
     coincidences = sum(map(lambda coincidences_array : coincidences_array == True, coincidences_array  ))
     percentage =100 * coincidences/coincidences_array.shape
 
-    print(percentage)
+    return percentage
     
 
 
@@ -196,14 +204,10 @@ def main():
 
     Thetas_matrix = oneVsAll(X_ones, y, 10, reg, Thetas)
 
-    all_samples_comparator(X_ones, y, 10, Thetas_matrix)
+    percentage = all_samples_comparator_percentage(X_ones, y, 10, Thetas_matrix)
+
+    print(percentage)
 
 
-    #X_ = X_ones[4998, :]
-    #num_tag = Comparator(X_, num_etiquetas, Thetas_matrix)
-
-    #print(num_tag)
-
-
-
-main()
+#main()
+load_data_neuronal_red("ex3weights.mat")
