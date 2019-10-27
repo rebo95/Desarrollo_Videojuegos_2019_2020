@@ -25,8 +25,6 @@ def load_data(file_name):
 def load_data_neuronal_red(file_name):
     weights = loadmat(file_name)
     theta1 , theta2 = weights [ 'Theta1' ] , weights [ 'Theta2' ]
-    print(theta1)
-    print(theta2)
 
     return theta1, theta2
 
@@ -49,6 +47,15 @@ def g_z(X):
     sigmoide = 1/(1 + e_z)
 
     return sigmoide
+
+def vectors_coincidence_percentage(a, b):
+    
+    coincidences_array = a == b
+
+    coincidences = sum(map(lambda coincidences_array : coincidences_array == True, coincidences_array  ))
+    percentage =100 * coincidences/coincidences_array.shape
+
+    return percentage
 
 def cost(Thetas, X, Y):
 
@@ -154,28 +161,8 @@ def oneVsAll(X, y, num_etiquetas, reg, Thetas):
     #PARA EL VALOR DE 5 POR EJEMPLO TENDRIAMOS UNA Y DE [0 0 0 0 0 1 0 0 0 0 ]
     #SIGMOIDE MAXIMO ES EL QUE ESTÁ MAS SEGURO DE LA SALIDA LO QUE IMPLICA QUE SE REFIERE A ESE NUMERO NESIMO CON LOS VALORES DE PESOS DE LA MATRIZ
 
-#np.set_printoptions(threshold=sys.maxsize)
-def all_samples_comparator_percentage(X, y, num_etiquetas, Thetas_matrix):
-    
-    samples = X.shape[0]
-    y_ = np.zeros(samples)
-    y = np.where(y == 10, 0, y)
 
-    for i in range(samples):
-        y_[i] = Comparator(X[i, :], num_etiquetas, Thetas_matrix)
-
-    coincidences_array = y_ == y
-
-    coincidences = sum(map(lambda coincidences_array : coincidences_array == True, coincidences_array  ))
-    percentage =100 * coincidences/coincidences_array.shape
-
-    return percentage
-    
-
-
-
-
-def Comparator(X, num_etiquetas, Thetas_matrix):
+def Comparator_One_Vs_All(X, num_etiquetas, Thetas_matrix):
 
     sigmoids = np.zeros(num_etiquetas)
 
@@ -192,22 +179,107 @@ def Comparator(X, num_etiquetas, Thetas_matrix):
 
     return num_tag
 
+def all_samples_comparator_percentage(X, y, num_etiquetas, reg, Thetas):
+
+    Thetas_matrix = oneVsAll(X, y, num_etiquetas, reg, Thetas)
+
+    samples = X.shape[0]
+    y_ = np.zeros(samples)
+    y = np.where(y == 10, 0, y)
+
+    for i in range(samples):
+        y_[i] = Comparator_One_Vs_All(X[i, :], num_etiquetas, Thetas_matrix)
+
+    
+    percentage = vectors_coincidence_percentage(y_, y)
+
+    return percentage
+
+def forward_propagation(X, theta1, theta2):
+    '''
+    a1 = X
+    a1_ones = np.hstack([np.ones([a1.shape[0],1]),a1])
+
+    z2 = H(theta1, np.transpose(a1_ones))
+    a2 = g_z(z2)
+
+    a2_t = np.transpose(a2)
+
+    a2_ones = np.hstack([np.ones([a2_t.shape[0],1]),a2_t])
+
+    z3 = H(theta2, np.transpose(a2_ones))
+    a3 = g_z(z3)
+
+    y = a3
+
+    '''
+
+    #V1
+    a1 = X
+    a1_ones = np.hstack([np.ones([a1.shape[0],1]),a1])
+    z2 = H(a1_ones, np.transpose(theta1))
+    a2 = g_z(z2)
+
+    a2_ones = np.hstack([np.ones([a2.shape[0],1]),a2])
+
+    z3 = H(a2_ones, np.transpose(theta2))
+    a3 = g_z(z3)
+
+    y = a3
+
+    return y
+
+
+
+
+def neuronal_prediction_vector(sigmoids_matrix) :
+    samples = sigmoids_matrix.shape[0]
+    y = np.zeros(samples)
+
+    for i in range(samples):
+        y[i] = np.argmax(sigmoids_matrix[i, :])
+
+    return y
+
+def neuronal_prediction_vector_v2(sigmoids_matrix) :
+    samples = sigmoids_matrix.shape[1]
+    y = np.zeros(samples)
+
+    for i in range(samples):
+        y[i] = np.argmax(sigmoids_matrix[:, i])
+
+
+def neuronal_succes_percentage(X, y, theta1, theta2) :
+
+    y = np.where(y == 10, 0, y)
+
+    sigmoids_matrix = forward_propagation(X, theta1, theta2)
+    y_ = neuronal_prediction_vector(sigmoids_matrix)
+    print(y_)
+    percentage = vectors_coincidence_percentage(y_, y)
+
+    return percentage
+
+
+np.set_printoptions(threshold=sys.maxsize)
 def main():
 
     reg = 1
     num_etiquetas = 10
     y, X = load_data("ex3data1")
     #draw_rnd_selection_data(X)
-
     X_ones = np.hstack([np.ones([X.shape[0],1]),X]) #adding the one collum
+
     Thetas = np.zeros(X_ones.shape[1])
 
-    Thetas_matrix = oneVsAll(X_ones, y, 10, reg, Thetas)
+    #percentage = all_samples_comparator_percentage(X_ones, y, num_etiquetas, reg, Thetas)
+    
 
-    percentage = all_samples_comparator_percentage(X_ones, y, 10, Thetas_matrix)
+
+    theta1, theta2 = load_data_neuronal_red("ex3weights.mat")
+    
+    percentage = neuronal_succes_percentage(X, y, theta1, theta2)
 
     print(percentage)
 
-
-#main()
-load_data_neuronal_red("ex3weights.mat")
+main()
