@@ -162,7 +162,7 @@ def oneVsAll(X, y, num_etiquetas, reg, Thetas):
     #SIGMOIDE MAXIMO ES EL QUE ESTÁ MAS SEGURO DE LA SALIDA LO QUE IMPLICA QUE SE REFIERE A ESE NUMERO NESIMO CON LOS VALORES DE PESOS DE LA MATRIZ
 
 
-def Comparator_One_Vs_All(X, num_etiquetas, Thetas_matrix):
+def Sample_clasifier(sample, num_etiquetas, Thetas_matrix):
 
     sigmoids = np.zeros(num_etiquetas)
 
@@ -170,12 +170,11 @@ def Comparator_One_Vs_All(X, num_etiquetas, Thetas_matrix):
                                         #same number the thetas values represent 
         Z_ = Thetas_matrix[i, :]
 
-        H_ = H(X, Z_)
+        H_ = H(sample, Z_)
         H_sigmoid = g_z(H_)
         sigmoids[i] = H_sigmoid 
 
-    tag = np.where(sigmoids == np.amax(sigmoids))
-    num_tag = tag[0]
+    num_tag = np.argmax(sigmoids)
 
     return num_tag
 
@@ -188,7 +187,7 @@ def all_samples_comparator_percentage(X, y, num_etiquetas, reg, Thetas):
     y = np.where(y == 10, 0, y)
 
     for i in range(samples):
-        y_[i] = Comparator_One_Vs_All(X[i, :], num_etiquetas, Thetas_matrix)
+        y_[i] = Sample_clasifier(X[i, :], num_etiquetas, Thetas_matrix)
 
     
     percentage = vectors_coincidence_percentage(y_, y)
@@ -211,7 +210,6 @@ def forward_propagation(X, theta1, theta2):
     a3 = g_z(z3)
 
     y = a3
-
     '''
 
     #V1
@@ -228,8 +226,6 @@ def forward_propagation(X, theta1, theta2):
     y = a3
 
     return y
-
-
 
 
 def neuronal_prediction_vector(sigmoids_matrix) :
@@ -272,14 +268,13 @@ def main():
 
     Thetas = np.zeros(X_ones.shape[1])
 
-    #percentage = all_samples_comparator_percentage(X_ones, y, num_etiquetas, reg, Thetas)
+    percentage = all_samples_comparator_percentage(X_ones, y, num_etiquetas, reg, Thetas)
     
-
-
+    '''
     theta1, theta2 = load_data_neuronal_red("ex3weights.mat")
     
     percentage = neuronal_succes_percentage(X, y, theta1, theta2)
-
+    '''
     print(percentage)
 
 main()
