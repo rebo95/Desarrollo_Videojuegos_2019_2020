@@ -40,7 +40,7 @@ def two_power(X):
 def H(X, Z): #Hipótesis del mocelo lineal vectorizada 
     return np.dot(X, Z)
     
-def g_z(X):
+def sigmoid(X):
 
     e_z = 1 / np.power(math.e, X) #np.power => First array elements raised to powers from second array, element-wise.
 
@@ -65,7 +65,7 @@ def cost(Thetas, X, Y):
 
     #A
     X_Teta = np.dot(X, Thetas)
-    g_X_Thetas = g_z(X_Teta)
+    g_X_Thetas = sigmoid(X_Teta)
     log_g_X_Thetas = np.log(g_X_Thetas)
     T_log_g_X_Thetas = np.transpose(log_g_X_Thetas)
     y_T_log_g_X_Thetas = np.dot(T_log_g_X_Thetas, Y)
@@ -115,7 +115,7 @@ def gradient(Thetas, X, Y):
     
 
     X_Teta = np.dot(X, Thetas)
-    g_X_Thetas = g_z(X_Teta)
+    g_X_Thetas = sigmoid(X_Teta)
 
     X_T = np.transpose(X)
 
@@ -171,7 +171,7 @@ def Sample_clasifier(sample, num_etiquetas, Thetas_matrix):
         Z_ = Thetas_matrix[i, :]
 
         H_ = H(sample, Z_)
-        H_sigmoid = g_z(H_)
+        H_sigmoid = sigmoid(H_)
         sigmoids[i] = H_sigmoid 
 
     num_tag = np.argmax(sigmoids)
@@ -195,24 +195,8 @@ def all_samples_comparator_percentage(X, y, num_etiquetas, reg, Thetas):
     return percentage
 
 def forward_propagation(X, theta1, theta2):
-    '''
-    a1 = X
-    a1_ones = np.hstack([np.ones([a1.shape[0],1]),a1])
-
-    z2 = H(theta1, np.transpose(a1_ones))
-    a2 = g_z(z2)
-
-    a2_t = np.transpose(a2)
-
-    a2_ones = np.hstack([np.ones([a2_t.shape[0],1]),a2_t])
-
-    z3 = H(theta2, np.transpose(a2_ones))
-    a3 = g_z(z3)
-
-    y = a3
-    '''
-
     #V1
+    '''
     a1 = X
     a1_ones = np.hstack([np.ones([a1.shape[0],1]),a1])
     z2 = H(a1_ones, np.transpose(theta1))
@@ -224,14 +208,22 @@ def forward_propagation(X, theta1, theta2):
     a3 = g_z(z3)
 
     y = a3
+    '''
 
-    return y
+    m = X.shape[0]
+    a1 = np.hstack([np.ones([m, 1]), X])
+    z2 = np.dot(a1, theta1.T)
+    a2 = np.hstack([np.ones([m, 1]), sigmoid(z2)])
+    z3 = np.dot(a2, theta2.T)
+    h = sigmoid(z3)
+
+    return h
 
 
 def neuronal_prediction_vector(sigmoids_matrix) :
     samples = sigmoids_matrix.shape[0]
     y = np.zeros(samples)
-
+      
     for i in range(samples):
         y[i] = np.argmax(sigmoids_matrix[i, :])
 
@@ -251,21 +243,23 @@ def neuronal_succes_percentage(X, y, theta1, theta2) :
 
     sigmoids_matrix = forward_propagation(X, theta1, theta2)
     y_ = neuronal_prediction_vector(sigmoids_matrix)
-    print(y_)
     percentage = vectors_coincidence_percentage(y_, y)
 
     return percentage
 
 
-np.set_printoptions(threshold=sys.maxsize)
+#np.set_printoptions(threshold=sys.maxsize)
 def main():
 
     reg = 1
     num_etiquetas = 10
     y, X = load_data("ex3data1")
     #draw_rnd_selection_data(X)
+
+
     X_ones = np.hstack([np.ones([X.shape[0],1]),X]) #adding the one collum
 
+    '''
     Thetas = np.zeros(X_ones.shape[1])
 
     percentage = all_samples_comparator_percentage(X_ones, y, num_etiquetas, reg, Thetas)
@@ -274,7 +268,7 @@ def main():
     theta1, theta2 = load_data_neuronal_red("ex3weights.mat")
     
     percentage = neuronal_succes_percentage(X, y, theta1, theta2)
-    '''
+    
     print(percentage)
 
 main()
