@@ -209,7 +209,7 @@ def forward_propagation(X, theta1, theta2):
 
     y = a3
     '''
-
+    
     m = X.shape[0]
     a1 = np.hstack([np.ones([m, 1]), X])
     z2 = np.dot(a1, theta1.T)
@@ -225,21 +225,10 @@ def neuronal_prediction_vector(sigmoids_matrix) :
     y = np.zeros(samples)
       
     for i in range(samples):
-        y[i] = np.argmax(sigmoids_matrix[i, :])
-
+        y[i] = np.argmax(sigmoids_matrix[i, :]) +1 
     return y
 
-def neuronal_prediction_vector_v2(sigmoids_matrix) :
-    samples = sigmoids_matrix.shape[1]
-    y = np.zeros(samples)
-
-    for i in range(samples):
-        y[i] = np.argmax(sigmoids_matrix[:, i])
-
-
 def neuronal_succes_percentage(X, y, theta1, theta2) :
-
-    y = np.where(y == 10, 0, y)
 
     sigmoids_matrix = forward_propagation(X, theta1, theta2)
     y_ = neuronal_prediction_vector(sigmoids_matrix)
@@ -248,7 +237,7 @@ def neuronal_succes_percentage(X, y, theta1, theta2) :
     return percentage
 
 
-#np.set_printoptions(threshold=sys.maxsize)
+np.set_printoptions(threshold=sys.maxsize)
 def main():
 
     reg = 1
@@ -259,16 +248,18 @@ def main():
 
     X_ones = np.hstack([np.ones([X.shape[0],1]),X]) #adding the one collum
 
-    '''
+    
     Thetas = np.zeros(X_ones.shape[1])
 
     percentage = all_samples_comparator_percentage(X_ones, y, num_etiquetas, reg, Thetas)
     
-    '''
+    print("Percentage one vs all : ", percentage)
+
+
     theta1, theta2 = load_data_neuronal_red("ex3weights.mat")
     
     percentage = neuronal_succes_percentage(X, y, theta1, theta2)
     
-    print(percentage)
+    print("Percentage neuronal red : ", percentage)
 
 main()
