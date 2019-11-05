@@ -32,8 +32,8 @@ def sigmoid(X):
 
 def derived_sigmoid(X):
 
-    sigmoid = sigmoid(X)
-    sigmoide_derived = np.multiply(sigmoid, (1-sigmoid))
+    s = sigmoid(X)
+    sigmoide_derived = np.multiply(s, (1-s))
 
 def displayData(X):
     num_plots = int(np.size(X, 0)**.5)
@@ -78,15 +78,6 @@ def load_wwights_neuronal_red(file_name): #parameters of a neruonal red
 
     
     return theta1, theta2
-
-def sigmoid(X):
-
-    e_z = 1 / np.power(math.e, X) #np.power => First array elements raised to powers from second array, element-wise.
-
-    sigmoide = 1/(1 + e_z)
-
-    return sigmoide
-
 
 np.set_printoptions(threshold=sys.maxsize)
 
