@@ -14,12 +14,26 @@ import sys
 from IPython.display import display
 import pandas as pd
 
+import random
+
 def rnd_selection_data(X, num_samples):
     sample = np.random.choice(X.shape[0], num_samples) #it returns the index of the random selected rows
     rnd_selected_rows_matrix = X[sample, :]
 
     return rnd_selected_rows_matrix
 
+def sigmoid(X):
+
+    e_z = 1 / np.power(math.e, X) #np.power => First array elements raised to powers from second array, element-wise.
+
+    sigmoide = 1/(1 + e_z)
+
+    return sigmoide
+
+def derived_sigmoid(X):
+
+    sigmoid = sigmoid(X)
+    sigmoide_derived = np.multiply(sigmoid, (1-sigmoid))
 
 def displayData(X):
     num_plots = int(np.size(X, 0)**.5)
@@ -79,9 +93,9 @@ np.set_printoptions(threshold=sys.maxsize)
 def cost(theta1, theta2, X, y):
 
     m = X.shape[0] 
-    h = H_f_p(X, theta1, theta2)
-    print(theta1.shape)
     num_labels = 10
+
+    h = H_f_p(X, theta1, theta2)
 
     y = (y - 1)
     y_onehot = np.zeros((m, num_labels))  # 5000 x 10
@@ -89,7 +103,7 @@ def cost(theta1, theta2, X, y):
     for i in range(m):
         y_onehot[i][y[i]] = 1
         
-    
+    '''
     J = 0
 
     for i in range(m):
@@ -98,9 +112,9 @@ def cost(theta1, theta2, X, y):
             second_term = np.multiply((1 - y_onehot[i, j]), np.log(1 - h[i, j]))
             J += np.sum(first_term - second_term)
     J = J / m
-    
+    '''
 
-    #J = np.sum(np.multiply(-y_onehot, np.log(h)) - np.multiply((1 - y_onehot), np.log(1 - h))) / m #using np.multiply because it is multiplication member to member
+    J = np.sum(np.multiply(-y_onehot, np.log(h)) - np.multiply((1 - y_onehot), np.log(1 - h))) / m #using np.multiply because it is multiplication member to member
 
     return J
 
@@ -139,9 +153,6 @@ def cost_regularized(theta1, theta2, X, y, h):
     J = cost(theta1, theta2, X, y) + r_term
 
     return J
-
-
-
 
 def gradient(Thetas, X, Y):
 
@@ -190,6 +201,22 @@ def H_f_p(X, theta1, theta2):
 
     return h
 
+def random_Weights(L_in, L_out):
+
+    e_ini = math.sqrt(6)/math.sqrt(L_in + L_out)
+
+    e_ini= 0.12
+
+    weights = np.zeros((L_out, 1 + L_in))
+
+    for i in range(L_out):
+        for j in range(1 + L_in):
+
+            rnd = random.uniform(-e_ini, e_ini)
+            weights[i,j] = rnd
+
+    return weights
+
 def backprop(params_rn , num_entradas , num_ocultas , num_etiquetas , X, y, reg):
 
     theta1 = np.reshape(params_rn[: num_ocultas * (num_entradas + 1)], (num_ocultas, (num_entradas + 1)))
@@ -214,6 +241,7 @@ def main():
     J_ = cost_regularized(theta1, theta2, X, y, 1)
     
     print(J_)
+
 
 
 
