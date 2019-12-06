@@ -161,16 +161,21 @@ def displayImage(im):
 
 np.set_printoptions(threshold=sys.maxsize)
 
+def unrollVect(a, b):
+    thetaVec_ = np.concatenate((np.ravel(a), np.ravel(b)))
+    return thetaVec_
 
 def sigmoid(x):
     return 1/(1 + np.exp((-x)))
 
-def sigmoidDerived(x):
+def sigmoid_Derived(x):
     return x * (1 - x)
 
-def sigmoidGradient(z):
+def sigmoid_Gradient(z):
     sig_z = sigmoid(z)
     return np.multiply(sig_z, (1 - sig_z))
+
+#___________________________________________________________________________________________________________________
 
 def forward(X, theta1, theta2):
     m = X.shape[0]
@@ -183,14 +188,15 @@ def forward(X, theta1, theta2):
 
     return a1, z2, a2, z3, h
 
-def cost(params, input_size, hidden_size, num_labels, X, y, learning_rate):
+
+def cost(params, num_entradas, num_ocultas, num_etiquetas, X, y, tasa_aprendizaje):
 
     m = X.shape[0]
     X = np.matrix(X)
     y = np.matrix(y) 
 
-    theta1 = np.matrix(np.reshape(params[:hidden_size * (input_size + 1)], (hidden_size, (input_size + 1))))
-    theta2 = np.matrix(np.reshape(params[hidden_size * (input_size + 1):], (num_labels, (hidden_size + 1))))
+    theta1 = np.matrix(np.reshape(params[:num_ocultas * (num_entradas + 1)], (num_ocultas, (num_entradas + 1))))
+    theta2 = np.matrix(np.reshape(params[num_ocultas * (num_entradas + 1):], (num_etiquetas, (num_ocultas + 1))))
 
     h = forward(X, theta1, theta2)[4]
 
@@ -198,37 +204,28 @@ def cost(params, input_size, hidden_size, num_labels, X, y, learning_rate):
 
     return J, theta1, theta2
 
-def costRegularized(params, input_size, hidden_size, num_labels, X, y, learning_rate):
+def cost_Regularized(params, num_entradas, num_ocultas, num_etiquetas, X, y, tasa_aprendizaje):
 
     m = X.shape[0]
 
-    J_, theta1, theta2 = cost(params, input_size, hidden_size, num_labels, X, y, learning_rate)
+    J_, theta1, theta2 = cost(params, num_entradas, num_ocultas, num_etiquetas, X, y, tasa_aprendizaje)
     
-    J_regularized =  J_ + (float(learning_rate) /
+    J_regularized =  J_ + (float(tasa_aprendizaje) /
             (2 * m)) * (np.sum(np.power(theta1[:, 1:], 2)) + np.sum(np.power(theta2[:, 1:], 2)))
     
     return J_regularized
 
-def backprop_alternative(params, input_size, hidden_size, num_labels, X, y, learning_rate, regularize = True):
 
-    m = X.shape[0]
-    X = np.matrix(X)
-    y = np.matrix(y)
-
-    theta1 = np.matrix(np.reshape(params[:hidden_size * (input_size + 1)], (hidden_size, (input_size + 1))))
-    theta2 = np.matrix(np.reshape(params[hidden_size * (input_size + 1):], (num_labels, (hidden_size + 1))))
-
-    a1, z2, a2, z3, h = forward(X, theta1, theta2)
+def backProp_Deltas(a1, z2, a2, z3, h, theta1, theta2, y, m):
 
     delta1 = np.zeros(theta1.shape)
     delta2 = np.zeros(theta2.shape)
-    J = costRegularized(params, input_size, hidden_size, num_labels, X, y, learning_rate)
-
+    
     d3 = h - y
 
     z2 = np.insert(z2, 0, values=np.ones(1), axis=1)
 
-    d2 = np.multiply((theta2.T * d3.T).T, sigmoidGradient(z2))
+    d2 = np.multiply((theta2.T * d3.T).T, sigmoid_Gradient(z2))
 
     delta1 += (d2[:, 1:]).T * a1
     delta2 += d3.T * a2
@@ -236,15 +233,42 @@ def backprop_alternative(params, input_size, hidden_size, num_labels, X, y, lear
     delta1 = delta1 / m
     delta2 = delta2 / m
 
-    # add regularization term if needed
-    if regularize:
-        delta1[:, 1:] = delta1[:, 1:] + (theta1[:, 1:] * learning_rate) / m
-        delta2[:, 1:] = delta2[:, 1:] + (theta2[:, 1:] * learning_rate) / m
+    return delta1, delta2
 
-    # unravel the gradient matrices into a single array
-    grad = np.concatenate((np.ravel(delta1), np.ravel(delta2)))
+
+def backProp_Deltas_regularized(a1, z2, a2, z3, h, theta1, theta2, y, m, tasa_aprendizaje):
+
+    delta1, delta2 = backProp_Deltas(a1, z2, a2, z3, h, theta1, theta2, y, m)
+
+    delta1[:, 1:] = delta1[:, 1:] + (theta1[:, 1:] * tasa_aprendizaje) / m
+    delta2[:, 1:] = delta2[:, 1:] + (theta2[:, 1:] * tasa_aprendizaje) / m
+
+    return delta1, delta2
+
+
+def backprop(params, num_entradas, num_ocultas, num_etiquetas, X, y, tasa_aprendizaje, regularize = False):
+
+    m = X.shape[0]
+    X = np.matrix(X)
+    y = np.matrix(y)
+
+    theta1 = np.matrix(np.reshape(params[:num_ocultas * (num_entradas + 1)], (num_ocultas, (num_entradas + 1))))
+    theta2 = np.matrix(np.reshape(params[num_ocultas * (num_entradas + 1):], (num_etiquetas, (num_ocultas + 1))))
+
+    a1, z2, a2, z3, h = forward(X, theta1, theta2)
+
+    if regularize:
+        delta1, delta2 = backProp_Deltas_regularized(a1, z2, a2, z3, h, theta1, theta2, y, m, tasa_aprendizaje)
+    else :
+        delta1, delta2 = backProp_Deltas(a1, z2, a2, z3, h, theta1, theta2, y, m)
+
+    J = cost_Regularized(params, num_entradas, num_ocultas, num_etiquetas, X, y, tasa_aprendizaje)
+
+    grad = unrollVect(delta1, delta2)
 
     return J, grad
+
+
 
 
 def gradient(Thetas, X, Y):
@@ -259,24 +283,24 @@ def gradient_regularized(Thetas, X, Y, h):
     #(δJ(θ)/δθj) =(1/m)*XT*(g(Xθ) − y) + (λ/2m)(Theta)
 
 
-def optimized_parameters_regularized(Thetas, X, Y, reg):
+def optimized_parameters_regularized(Thetas, X, Y, tasa_aprendizaje):
 
-    result = opt.fmin_tnc(func = cost_regularized, x0 = Thetas, fprime = gradient_regularized, args = (X, Y, reg) )
+    result = opt.fmin_tnc(func = cost_Regularized, x0 = Thetas, fprime = gradient_regularized, args = (X, Y, tasa_aprendizaje) )
     theta_opt = result[0]
 
     return theta_opt
 
 
-def oneVsAll(X, y, num_etiquetas, reg, Thetas):
+def oneVsAll(X, y, num_etiquetas, tasa_aprendizaje, Thetas):
 
     y_= (y == 10).astype(np.int)
-    Thetas_ = optimized_parameters_regularized(Thetas, X, y_, reg)
+    Thetas_ = optimized_parameters_regularized(Thetas, X, y_, tasa_aprendizaje)
 
     optimiced_parameters_matrix = Thetas_
 
     for i in range(1, num_etiquetas):
         y_ = (y == i).astype(np.int)
-        Thetas_ = optimized_parameters_regularized(Thetas, X, y_, reg)
+        Thetas_ = optimized_parameters_regularized(Thetas, X, y_, tasa_aprendizaje)
         optimiced_parameters_matrix = np.vstack((optimiced_parameters_matrix, Thetas_))
     
     
@@ -299,32 +323,6 @@ def random_Weights(L_in, L_out):
 
     return weights
 
-def backPropDeltas(a1, z2, a2, z3, h, theta1, theta2, y, m):
-
-    delta1 = np.zeros(theta1.shape)  # (25, 401)
-    delta2 = np.zeros(theta2.shape)  # (10, 26)
-
-    for t in range(m):
-        a1t = a1[t, :]
-        a2t= a2[t, :]
-        ht = h[t, :]
-        yt = y[t]
-
-        d3t = ht - yt
-        d2t = np.dot(theta2.T, d3t) * (a2t * (1 - a2t))
-
-        delta1 = delta1 + np.dot(d2t[1:, np.newaxis], a1t[np.newaxis, :])
-        delta2 = delta2 + np.dot(d3t[:, np.newaxis], a2t[np.newaxis, :])
-
-        delta1 = delta1 / m
-        delta2 = delta2 / m
-
-        return delta1, delta2
-
-
-def unrollVect(a, b):
-    thetaVec_ = np.concatenate((np.ravel(a), np.ravel(b)))
-    return thetaVec_
 
 def y_onehot(y, X, num_labels):
 
@@ -338,25 +336,23 @@ def y_onehot(y, X, num_labels):
     
     return y_onehot
 
+#___________________________________________________________________________________________________________________
+
 def main():
 
     X, y = load_data("ex4data1.mat")
     
-    reg = 1
+    tasa_aprendizaje = 0
     num_etiquetas = 10 #num_etiquetas = num_salidas
     num_entradas = 400
     num_ocultas = 25
 
-    #params_rn = (np.random.random(size = num_ocultas * (num_entradas + 1) + num_etiquetas * (num_ocultas + 1)) - 0.5) * 0.25
     theta1, theta2 = load_wwights_neuronal_red("ex4weights.mat")
     params_rn = unrollVect(theta1, theta2)
 
     ys_ = y_onehot(y, X, num_etiquetas)
 
-    #backprop_alternative(params_rn, num_entradas, num_ocultas, num_etiquetas, X, ys_, reg, True)
-
-    #cost, grad = backprop(params_rn , num_entradas , num_ocultas , num_etiquetas , X, ys_, reg)
-    print(checkNNGradients(backprop_alternative, reg))
+    print(checkNNGradients(backprop, tasa_aprendizaje))
 
 
 main()
