@@ -117,14 +117,14 @@ def load_data(file_name):
 
     return  X, y_2
 
-def load_wwights_neuronal_red(file_name): #parameters of a neruonal red
+def load_wwights_neuronal_red(file_name): #Carga los parámetros de una red neuronal
     weights = loadmat(file_name)
     theta1 , theta2 = weights ['Theta1'] , weights ['Theta2']
 
     return theta1, theta2
 
-def rnd_selection_data(X, num_samples):
-    sample = np.random.choice(X.shape[0], num_samples) #it returns the index of the random selected rows
+def rnd_selection_data(X, num_samples): #Elige aleatoriamente una selección de entradas dentro de la población de datos
+    sample = np.random.choice(X.shape[0], num_samples)
     rnd_selected_rows_matrix = X[sample, :]
 
     return rnd_selected_rows_matrix
@@ -136,7 +136,7 @@ def data_printer(X, num_samples):
     displayData(rnd_samples_matrix)
     plt.show()
 
-def displayData(X):
+def displayData(X):#Convierte los valores de entrada en un elemento representable pro una imagen
     num_plots = int(np.size(X, 0)**.5)
     fig, ax = plt.subplots(num_plots, num_plots, sharex=True, sharey=True)
     plt.subplots_adjust(left=0, wspace=0, hspace=0)
@@ -152,18 +152,47 @@ def displayData(X):
 
     return (fig, ax)
 
-def displayImage(im):
+def displayImage(im):#Nos premite imprimir una imagen
     fig2, ax2 = plt.subplots()
     image = im.reshape(20, 20).T
     ax2.imshow(image, cmap='gray')
     return (fig2, ax2)
 #___________________________________________________________________________________________________________________
 
-np.set_printoptions(threshold=sys.maxsize)
-
-def unrollVect(a, b):
+def unrollVect(a, b): #nos permite desplegar en un vector otros dos
     thetaVec_ = np.concatenate((np.ravel(a), np.ravel(b)))
     return thetaVec_
+
+def generate_Random_Weights(L_in, L_out): #Genera un array de pesos para una capa de una red neuronal con entrada L_in y salida L_out
+
+    e_ini = math.sqrt(6)/math.sqrt(L_in + L_out)
+
+    e_ini= 0.12
+
+    weights = np.zeros((L_out, 1 + L_in))
+
+    for i in range(L_out):
+        for j in range(1 + L_in):
+
+            rnd = random.uniform(-e_ini, e_ini)
+            weights[i,j] = rnd
+
+    return weights
+
+
+def y_onehot(y, X, num_etiquetas):
+    #Devuelve la salida en forma de matriz lista para ser utilizada por nuestros métodos de la red neuronal
+    m = X.shape[0]
+
+    y = (y - 1)
+    y_onehot = np.zeros((m, num_etiquetas))  # 5000 x 10
+    
+    for i in range(m):
+        y_onehot[i][y[i]] = 1
+    
+    return y_onehot
+
+#___________________________________________________________________________________________________________________
 
 def sigmoid(x):
     return 1/(1 + np.exp((-x)))
@@ -175,9 +204,8 @@ def sigmoid_Gradient(z):
     sig_z = sigmoid(z)
     return np.multiply(sig_z, (1 - sig_z))
 
-#___________________________________________________________________________________________________________________
-
-def forward(X, theta1, theta2):
+def forward(X, theta1, theta2):#Método pasada hacia adelante para la implementación de la red neuronal
+    #Nos devuelve los parámetros de activación de la red neuronal y el valor h
     m = X.shape[0]
 
     a1 = np.insert(X, 0, values=np.ones(m), axis=1)
@@ -190,7 +218,7 @@ def forward(X, theta1, theta2):
 
 
 def cost(params, num_entradas, num_ocultas, num_etiquetas, X, y, tasa_aprendizaje):
-
+#Funcion que calcula el coste base(sin regularizar)
     m = X.shape[0]
     X = np.matrix(X)
     y = np.matrix(y) 
@@ -205,7 +233,7 @@ def cost(params, num_entradas, num_ocultas, num_etiquetas, X, y, tasa_aprendizaj
     return J, theta1, theta2
 
 def cost_Regularized(params, num_entradas, num_ocultas, num_etiquetas, X, y, tasa_aprendizaje):
-
+#Cálculo del coste con el ajuste de regularización
     m = X.shape[0]
 
     J_, theta1, theta2 = cost(params, num_entradas, num_ocultas, num_etiquetas, X, y, tasa_aprendizaje)
@@ -246,7 +274,7 @@ def backProp_Deltas_regularized(a1, z2, a2, z3, h, theta1, theta2, y, m, tasa_ap
     return delta1, delta2
 
 
-def backprop(params, num_entradas, num_ocultas, num_etiquetas, X, y, tasa_aprendizaje, regularize = False):
+def backprop(params, num_entradas, num_ocultas, num_etiquetas, X, y, tasa_aprendizaje, regularize = True):
 
     m = X.shape[0]
     X = np.matrix(X)
@@ -268,91 +296,37 @@ def backprop(params, num_entradas, num_ocultas, num_etiquetas, X, y, tasa_aprend
 
     return J, grad
 
+def minimice(backprop, params, num_entradas, num_ocultas, num_etiquetas, X, y, tasa_aprendizaje):
+    fmin = opt.minimize(fun=backprop, x0=params, args=(num_entradas, num_ocultas, num_etiquetas, X, y, tasa_aprendizaje), 
+    method='TNC', jac=True, options={'maxiter': 70})
 
+    return fmin
 
-
-def gradient(Thetas, X, Y):
-
-    m = X.shape[0]
-    #(δJ(θ)/δθj) =(1/m)*XT*(g(Xθ) − y)
-    
-
-def gradient_regularized(Thetas, X, Y, h):
-
-    m = X.shape[0]
-    #(δJ(θ)/δθj) =(1/m)*XT*(g(Xθ) − y) + (λ/2m)(Theta)
-
-
-def optimized_parameters_regularized(Thetas, X, Y, tasa_aprendizaje):
-
-    result = opt.fmin_tnc(func = cost_Regularized, x0 = Thetas, fprime = gradient_regularized, args = (X, Y, tasa_aprendizaje) )
-    theta_opt = result[0]
-
-    return theta_opt
-
-
-def oneVsAll(X, y, num_etiquetas, tasa_aprendizaje, Thetas):
-
-    y_= (y == 10).astype(np.int)
-    Thetas_ = optimized_parameters_regularized(Thetas, X, y_, tasa_aprendizaje)
-
-    optimiced_parameters_matrix = Thetas_
-
-    for i in range(1, num_etiquetas):
-        y_ = (y == i).astype(np.int)
-        Thetas_ = optimized_parameters_regularized(Thetas, X, y_, tasa_aprendizaje)
-        optimiced_parameters_matrix = np.vstack((optimiced_parameters_matrix, Thetas_))
-    
-    
-    return optimiced_parameters_matrix
-
-
-def random_Weights(L_in, L_out):
-
-    e_ini = math.sqrt(6)/math.sqrt(L_in + L_out)
-
-    e_ini= 0.12
-
-    weights = np.zeros((L_out, 1 + L_in))
-
-    for i in range(L_out):
-        for j in range(1 + L_in):
-
-            rnd = random.uniform(-e_ini, e_ini)
-            weights[i,j] = rnd
-
-    return weights
-
-
-def y_onehot(y, X, num_labels):
-
-    m = X.shape[0]
-
-    y = (y - 1)
-    y_onehot = np.zeros((m, num_labels))  # 5000 x 10
-    
-    for i in range(m):
-        y_onehot[i][y[i]] = 1
-    
-    return y_onehot
 
 #___________________________________________________________________________________________________________________
+
+#np.set_printoptions(threshold=sys.maxsize)
 
 def main():
 
     X, y = load_data("ex4data1.mat")
     
+
+
     tasa_aprendizaje = 0
     num_etiquetas = 10 #num_etiquetas = num_salidas
     num_entradas = 400
     num_ocultas = 25
 
-    theta1, theta2 = load_wwights_neuronal_red("ex4weights.mat")
+    #theta1, theta2 = load_wwights_neuronal_red("ex4weights.mat")
+    theta1 = generate_Random_Weights(num_entradas, num_ocultas)
+    theta2 = generate_Random_Weights(num_ocultas, num_etiquetas)
+
     params_rn = unrollVect(theta1, theta2)
 
-    ys_ = y_onehot(y, X, num_etiquetas)
-
-    print(checkNNGradients(backprop, tasa_aprendizaje))
+    y_ = y_onehot(y, X, num_etiquetas)
+    #print(checkNNGradients(backprop, tasa_aprendizaje))
+    print(minimice(backprop, params_rn, num_entradas, num_ocultas, num_etiquetas, X, y_, tasa_aprendizaje))
 
 
 main()
