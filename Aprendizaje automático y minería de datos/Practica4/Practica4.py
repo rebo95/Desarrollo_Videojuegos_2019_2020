@@ -29,8 +29,7 @@ def debugInitializeWeights(fan_in, fan_out):
 
     # Initialize W using "sin". This ensures that W is always of the same
     # values and will be useful in debugging.
-    W = np.array([np.sin(w) for w in
-                  range(np.size(W))]).reshape((np.size(W, 0), np.size(W, 1)))
+    W = np.array([np.sin(w) for w in range(np.size(W))]).reshape((np.size(W, 0), np.size(W, 1)))
 
     return W
 
@@ -89,16 +88,13 @@ def checkNNGradients(costNN, reg_param):
     nn_params = np.append(Theta1, Theta2).reshape(-1)
 
     # Compute Cost
-    cost, grad = costNN(nn_params,
-                        input_layer_size,
-                        hidden_layer_size,
-                        num_labels,
-                        X, ys, reg_param)
+    cost, grad = costNN(nn_params, input_layer_size, hidden_layer_size, 
+    num_labels, X, ys, reg_param)
 
     def reduced_cost_func(p):
         """ Cheaply decorated nnCostFunction """
-        return costNN(p, input_layer_size, hidden_layer_size, num_labels,
-                      X, ys, reg_param)[0]
+        return costNN(p, input_layer_size, hidden_layer_size, num_labels, 
+        X, ys, reg_param)[0]
 
     numgrad = computeNumericalGradient(reduced_cost_func, nn_params)
 
@@ -245,7 +241,7 @@ def cost_Regularized(params, num_entradas, num_ocultas, num_etiquetas, X, y, tas
 
 
 def backProp_Deltas(a1, z2, a2, z3, h, theta1, theta2, y, m):
-
+#Calculo de los gradientes
     delta1 = np.zeros(theta1.shape)
     delta2 = np.zeros(theta2.shape)
     
@@ -265,7 +261,7 @@ def backProp_Deltas(a1, z2, a2, z3, h, theta1, theta2, y, m):
 
 
 def backProp_Deltas_regularized(a1, z2, a2, z3, h, theta1, theta2, y, m, tasa_aprendizaje):
-
+#Calculo de los gradientes en formato regularizado 
     delta1, delta2 = backProp_Deltas(a1, z2, a2, z3, h, theta1, theta2, y, m)
 
     delta1[:, 1:] = delta1[:, 1:] + (theta1[:, 1:] * tasa_aprendizaje) / m
@@ -275,7 +271,7 @@ def backProp_Deltas_regularized(a1, z2, a2, z3, h, theta1, theta2, y, m, tasa_ap
 
 
 def backprop(params, num_entradas, num_ocultas, num_etiquetas, X, y, tasa_aprendizaje, regularize = True):
-
+#Pasada hacia adelante y hacia atrás en nuestra red neuronal, nos calcula el gradiente y el coste correspondientes a nuestra red neuronal
     m = X.shape[0]
     X = np.matrix(X)
     y = np.matrix(y)
@@ -311,8 +307,6 @@ def main():
 
     X, y = load_data("ex4data1.mat")
     
-
-
     tasa_aprendizaje = 0
     num_etiquetas = 10 #num_etiquetas = num_salidas
     num_entradas = 400
