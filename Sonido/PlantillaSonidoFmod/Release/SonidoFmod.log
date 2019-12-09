@@ -1,0 +1,9 @@
+﻿  FMOD.cpp
+C:\Users\Aaron\Desktop\Sonido\SonidoFmod\FMOD.cpp(112,21): warning C4244: '=': conversión de 'double' a 'float'; posible pérdida de datos
+C:\Users\Aaron\Desktop\Sonido\SonidoFmod\FMOD.cpp(118,21): warning C4244: '=': conversión de 'double' a 'float'; posible pérdida de datos
+  Generando código
+  2 of 24 functions ( 8.3%) were compiled, the rest were copied from previous compilation.
+    0 functions were new in current compilation
+    0 functions had inline decision re-evaluated but remain unchanged
+  Generación de código finalizada
+  SonidoFmod.vcxproj -> C:\Users\Aaron\Desktop\Sonido\SonidoFmod\Release\SonidoFmod.exe
