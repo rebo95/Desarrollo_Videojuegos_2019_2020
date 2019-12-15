@@ -159,6 +159,13 @@ def unrollVect(a, b): #nos permite desplegar en un vector otros dos
     thetaVec_ = np.concatenate((np.ravel(a), np.ravel(b)))
     return thetaVec_
 
+def rollVector(params, num_entradas, num_ocultas, num_etiquetas):
+    #pliega el vector params en dos vectores de parámetros correspondinetes a los vectores de pesos de cada una de las capas de nuestra red
+    vector1 = np.matrix(np.reshape(params[:num_ocultas * (num_entradas + 1)], (num_ocultas, (num_entradas + 1))))
+    vector2 = np.matrix(np.reshape(params[num_ocultas * (num_entradas + 1):], (num_etiquetas, (num_ocultas + 1))))
+
+    return vector1, vector2
+
 def generate_Random_Weights(L_in, L_out): #Genera un array de pesos para una capa de una red neuronal con entrada L_in y salida L_out
 
     e_ini = math.sqrt(6)/math.sqrt(L_in + L_out)
@@ -187,6 +194,17 @@ def y_onehot(y, X, num_etiquetas):
         y_onehot[i][y[i]] = 1
     
     return y_onehot
+
+#___________________________________________________________________________________________________________________
+
+def vectors_coincidence_percentage(a, b):
+    #Calcula el porcentaje de coincidencia dados dos vectores a, b
+    coincidences_array = a == b
+
+    coincidences = sum(map(lambda coincidences_array : coincidences_array == True, coincidences_array  ))
+    percentage =100 * coincidences/coincidences_array.shape
+
+    return percentage
 
 #___________________________________________________________________________________________________________________
 
@@ -279,6 +297,7 @@ def backprop(params, num_entradas, num_ocultas, num_etiquetas, X, y, tasa_aprend
     theta1 = np.matrix(np.reshape(params[:num_ocultas * (num_entradas + 1)], (num_ocultas, (num_entradas + 1))))
     theta2 = np.matrix(np.reshape(params[num_ocultas * (num_entradas + 1):], (num_etiquetas, (num_ocultas + 1))))
 
+
     a1, z2, a2, z3, h = forward(X, theta1, theta2)
 
     if regularize:
@@ -293,11 +312,34 @@ def backprop(params, num_entradas, num_ocultas, num_etiquetas, X, y, tasa_aprend
     return J, grad
 
 def minimice(backprop, params, num_entradas, num_ocultas, num_etiquetas, X, y, tasa_aprendizaje):
+    #Calcula los parámetros optimos de pesos para nuestra red neuronal
     fmin = opt.minimize(fun=backprop, x0=params, args=(num_entradas, num_ocultas, num_etiquetas, X, y, tasa_aprendizaje), 
     method='TNC', jac=True, options={'maxiter': 70})
 
-    return fmin
+    result = fmin.x
+    return result
 
+#___________________________________________________________________________________________________________________
+
+def neuronal_prediction_vector(sigmoids_matrix) :
+    #calcula los valores predichos por la red neuronal dada una matriz de sigmoides 
+    # Será generada por la funcón forward.
+
+    samples = sigmoids_matrix.shape[0]
+    y = np.zeros(samples)
+    
+    for i in range(samples):
+        y[i] = np.argmax(sigmoids_matrix[i, :]) +1
+
+    return y
+
+def neuronal_succes_percentage(X, y, weights1, weights2) :
+    #Compara los valores predichos por la red neuronal para unos 
+    sigmoids_matrix = forward(X, weights1, weights2)[4]
+    y_ = neuronal_prediction_vector(sigmoids_matrix)
+    percentage = vectors_coincidence_percentage(y_, y)
+
+    return percentage
 
 #___________________________________________________________________________________________________________________
 
@@ -307,20 +349,24 @@ def main():
 
     X, y = load_data("ex4data1.mat")
     
-    tasa_aprendizaje = 0
+    tasa_aprendizaje = 1
     num_etiquetas = 10 #num_etiquetas = num_salidas
     num_entradas = 400
     num_ocultas = 25
 
-    #theta1, theta2 = load_wwights_neuronal_red("ex4weights.mat")
     theta1 = generate_Random_Weights(num_entradas, num_ocultas)
     theta2 = generate_Random_Weights(num_ocultas, num_etiquetas)
 
     params_rn = unrollVect(theta1, theta2)
-
     y_ = y_onehot(y, X, num_etiquetas)
-    #print(checkNNGradients(backprop, tasa_aprendizaje))
-    print(minimice(backprop, params_rn, num_entradas, num_ocultas, num_etiquetas, X, y_, tasa_aprendizaje))
+
+    params_optimiced = minimice(backprop, params_rn, num_entradas, num_ocultas, num_etiquetas, X, y_, tasa_aprendizaje)
+
+    theta1_optimiced, theta2_optimiced = rollVector(params_optimiced, num_entradas, num_ocultas, num_etiquetas)
+
+    percentage = neuronal_succes_percentage(X, y, theta1_optimiced, theta2_optimiced)
+    
+    print("Percentage neuronal red : ", percentage)
 
 
 main()

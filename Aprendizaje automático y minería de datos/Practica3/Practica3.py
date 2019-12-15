@@ -189,7 +189,6 @@ def all_samples_comparator_percentage(X, y, num_etiquetas, reg, Thetas):
     for i in range(samples):
         y_[i] = Sample_clasifier(X[i, :], num_etiquetas, Thetas_matrix)
 
-    
     percentage = vectors_coincidence_percentage(y_, y)
 
     return percentage
