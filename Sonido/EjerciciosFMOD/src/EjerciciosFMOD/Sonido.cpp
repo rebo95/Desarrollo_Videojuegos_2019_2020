@@ -5,7 +5,8 @@
 Sonido::Sonido(const char* filename, FMOD::System* system)
 {
 	_system = system;
-	_resoult = _system->createSound(filename, FMOD_DEFAULT, 0, &_sound);
+	_resoult = _system->createSound(filename, FMOD_LOOP_NORMAL, 0, &_sound);
+	_resoult = _system->playSound(_sound, 0, true, &_channel);
 	_vol = 1.0f;
 	_panorama = 0.0f;
 }
@@ -16,18 +17,19 @@ Sonido::~Sonido()
 
 void Sonido::Play()
 {
-	_resoult = _system->playSound(_sound, 0, false, &_channel);
+	//_resoult = _system->playSound(_sound, 0, false, &_channel);
+	_resoult = _channel->setPaused(false);
 }
 
 void Sonido::Resume()
 {
-	std::cout << " Resumir\n";
 	_resoult = _channel->setPaused(false);
 }
 
 void Sonido::Stop()
 {
-	_resoult = _channel->stop();
+	_resoult = _channel->setPaused(true);
+	//_resoult = _channel->stop();
 }
 
 void Sonido::Pause()
@@ -63,13 +65,15 @@ void Sonido::DecreaseVolume()
 void Sonido::SetVolume(float vol)
 {
 	_vol = vol;
-	if(vol <= 1.0f || vol >= 0.0f)
-	_resoult = _channel->setVolume(vol);
+	if (vol <= 1.0f && vol >= 0.0f) {
+		std::cout << "Volumen = : " << _vol << "\n";
+		_resoult = _channel->setVolume(vol);
+	}
 }
 
 void Sonido::FadesVolumeSetter(float vol)
 {
-	if (vol <= 1.0f || vol >= 0.0f)
+	if (vol <= 1.0f && vol >= 0.0f)
 	_resoult = _channel->setVolume(vol);
 }
 
@@ -133,6 +137,15 @@ void Sonido::setPitch(float pitch)
 	_pitch = pitch;
 	_resoult = _channel->setPitch(_pitch);
 }
+
+float Sonido::getPitch()
+{
+	float currentPitch;
+	_resoult = _channel->getPitch(&currentPitch);
+	std::cout << " Pitch " << currentPitch << "\n";
+	return currentPitch;
+}
+
 
 void Sonido::Update()
 {

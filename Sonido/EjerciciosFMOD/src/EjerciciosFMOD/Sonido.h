@@ -52,6 +52,7 @@ public:
 	void FmodFadeOut(long long time);
 
 	void setPitch(float pitch);
+	float getPitch();
 
 	void Update();
 

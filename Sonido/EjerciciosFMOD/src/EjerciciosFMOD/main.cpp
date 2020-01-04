@@ -3,7 +3,7 @@
 #include "Sonido.h"
 #include "Piano.h"
 #include "Tablero.h"
-
+#include "Motor.h"
 
 #include <conio.h>
 #include <ctime>
@@ -21,14 +21,14 @@ int main() {
 
 	//Piano piano = Piano(System::_system);
 
-	Listener listener = Listener(System::_system);
-	SoundSorce sonido3D = SoundSorce("res/steps1.ogg", System::_system);
+	//Listener listener = Listener(System::_system);
+	//SoundSorce sonido3D = SoundSorce("res/steps1.ogg", System::_system);
 
-	ReverbPoint _reverbPoint1 = ReverbPoint(System::_system);
-	ReverbPoint _reverbPoint2 = ReverbPoint(System::_system);
+	//ReverbPoint _reverbPoint1 = ReverbPoint(System::_system);
+	//ReverbPoint _reverbPoint2 = ReverbPoint(System::_system);
 
-	Tablero tablero = Tablero(20, 40, &sonido3D, &listener, &_reverbPoint1, &_reverbPoint2, System::_system);
-	tablero.render();
+	//Tablero tablero = Tablero(20, 40, &sonido3D, &listener, &_reverbPoint1, &_reverbPoint2, System::_system);
+	//tablero.render();
 
 
 	bool fadeIn = false;
@@ -37,6 +37,10 @@ int main() {
 	//introducir en milisegundos
 	float MyfadeTime = 5000.0f;
 	float FmodFadeTime = 100000.0f;
+
+	//Ejercicio de los motores:
+	Motor motocicleta = Motor(System::_system);
+	motocicleta.StartEngine();
 
 	while (true) {
 
@@ -54,7 +58,7 @@ int main() {
 		//}
 
 
-		tablero.manageInput();
+		//tablero.manageInput();
 
 
 		////métodos update necesarios para los FadeInOut manuales implementados
@@ -63,6 +67,11 @@ int main() {
 
 
 		//piano.Teclado();
+
+
+
+		//ejercicio del motor
+		motocicleta.ManageInput();
 
 		System::_result = System::_system->update();
 	}

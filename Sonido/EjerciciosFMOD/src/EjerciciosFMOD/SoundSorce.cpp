@@ -22,6 +22,8 @@ void SoundSorce::Play()
 	_result = _system->playSound(_sound, 0, true, &_channel);
 	//colocamos el canal
 	_result = _channel->set3DAttributes(&_sorcePosition, &_sorceVel);
+	//inicializamos los valores de máxima y minima distancia
+	_result = _channel->set3DMinMaxDistance(_minDistance, _maxDistance);
 	//inicializamos el volumen del canal
 	_result = _channel->setVolume(_vol);
 	//ajustes de cono
@@ -131,7 +133,7 @@ void SoundSorce::DecreaseExteriorConeAngle()
 	std::cout << "Los angulos son I/E = " << _internalConeAngle << "/" << _exteriorConeAngle;
 }
 
-void SoundSorce::moveSorce()
+void SoundSorce::getSorceMovementAtributes()
 {
 	_result = _channel->get3DAttributes(&_sorcePosition, &_sorceVel);
 	std::cout << "PosiciónDeLaFuente : " << " x = " <<_sorcePosition.x << " y = "<<_sorcePosition.y <<" z ="<< _sorcePosition.z;

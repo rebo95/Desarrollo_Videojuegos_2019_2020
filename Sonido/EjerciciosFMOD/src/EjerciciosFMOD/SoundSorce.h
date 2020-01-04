@@ -5,10 +5,10 @@ class SoundSorce {
 private:
 
 	FMOD_VECTOR _sorcePosition = { 0,0,0 };
-	FMOD_VECTOR _sorceVel = { 10.0,0,0 };
+	FMOD_VECTOR _sorceVel = { 0.0,0,0 };
 	FMOD_VECTOR _coneDir = {0.0f, 1.0f, 0.0f}; // por defecto hacia adelante
 
-	float _minDistance = 1.0f;
+	float _minDistance = 2.0f;
 	float _maxDistance = 20.0f;
 
 	float _internalConeAngle = 360.0f;
@@ -46,7 +46,7 @@ public :
 	void DecreaseExteriorConeAngle();
 
 
-	void moveSorce();
+	void getSorceMovementAtributes();
 	void SetVel(float x, float y, float z);
 
 

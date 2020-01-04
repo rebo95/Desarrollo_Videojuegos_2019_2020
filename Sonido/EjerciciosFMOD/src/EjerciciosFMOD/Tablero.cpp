@@ -88,7 +88,7 @@ void Tablero::manageInput()
 		else if (key == 'l') { posXSorce++; }
 		else if (key == 'i') { posYSorce--; }
 
-		//setSourcePosition();
+		setSourcePosition();
 		setListenerPosition();
 		render();
 		std::cout << " ";
@@ -110,7 +110,7 @@ void Tablero::manageInput()
 		else if (key == '4') { _reverebPoint2->increaseMaxDistance(); }
 		else if (key == '9') { _reverbPont1->setActive(); }
 		else if (key == '0') { _reverebPoint2->setActive(); }
-		_source->moveSorce();
+		_source->getSorceMovementAtributes();
 	}
 
 
