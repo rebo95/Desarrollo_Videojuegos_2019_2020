@@ -9,10 +9,30 @@
 #include <ctime>
 #include <chrono>
 
+#include<fmod_studio.hpp>
+#include <fmod_studio_common.h>
+
+
 int main() {
 
 	System::init();
 
+
+	//CARGA DEL BANCO DE SONIDO
+	FMOD::Studio::System* _systemBanck = NULL;
+	FMOD::Studio::System::create(&_systemBanck);
+
+	//FMOD::Studio::Bank* stepsBank;
+	//_systemBanck->loadBankFile("res/Steps.bank", FMOD_STUDIO_LOAD_BANK_NORMAL, &stepsBank);
+
+	//stepsBank->loadSampleData();
+
+	//const char* path;
+	//FMOD::Studio::EventDescription** event;
+	//_systemBanck->getEvent(path, event);
+
+	//std::cout << path;
+	///////////////////////////
 	//Sonido sonido1 = Sonido("res/RobertMiles-Children.ogg", System::_system);
 	//sonido1.Play();
 
@@ -21,14 +41,14 @@ int main() {
 
 	//Piano piano = Piano(System::_system);
 
-	//Listener listener = Listener(System::_system);
-	//SoundSorce sonido3D = SoundSorce("res/steps1.ogg", System::_system);
+	Listener listener = Listener(System::_system);
+	SoundSorce sonido3D = SoundSorce("res/RobertMiles-Children.ogg", System::_system);
 
-	//ReverbPoint _reverbPoint1 = ReverbPoint(System::_system);
-	//ReverbPoint _reverbPoint2 = ReverbPoint(System::_system);
+	ReverbPoint _reverbPoint1 = ReverbPoint(System::_system);
+	ReverbPoint _reverbPoint2 = ReverbPoint(System::_system);
 
-	//Tablero tablero = Tablero(20, 40, &sonido3D, &listener, &_reverbPoint1, &_reverbPoint2, System::_system);
-	//tablero.render();
+	Tablero tablero = Tablero(20, 40, &sonido3D, &listener, &_reverbPoint1, &_reverbPoint2, System::_system);
+	tablero.render();
 
 
 	bool fadeIn = false;
@@ -39,8 +59,8 @@ int main() {
 	float FmodFadeTime = 100000.0f;
 
 	//Ejercicio de los motores:
-	Motor motocicleta = Motor(System::_system);
-	motocicleta.StartEngine();
+	//Motor motocicleta = Motor(System::_system);
+	//motocicleta.StartEngine();
 
 	while (true) {
 
@@ -58,7 +78,7 @@ int main() {
 		//}
 
 
-		//tablero.manageInput();
+		tablero.manageInput();
 
 
 		////métodos update necesarios para los FadeInOut manuales implementados
@@ -71,7 +91,7 @@ int main() {
 
 
 		//ejercicio del motor
-		motocicleta.ManageInput();
+		//motocicleta.ManageInput();
 
 		System::_result = System::_system->update();
 	}

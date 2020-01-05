@@ -1,11 +1,12 @@
 #include "ReverbPoint.h"
 #include <iostream>
+#include "System.h"
 
 ReverbPoint::ReverbPoint(FMOD::System* system)
 {
 	_system = system;
 	_result = _system->createReverb3D(&_reverb);
-
+	System::ERRCHECK(_result);
 	//FMOD_VECTOR _reverbPosition = { 0.0f,0.0f,0.0f };
 
 	//_minDistance = 5.0f;

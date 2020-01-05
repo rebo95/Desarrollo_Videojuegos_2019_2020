@@ -1,5 +1,6 @@
 #pragma once
 #include <fmod.hpp>
+#include "fmod_errors.h"
 
 class SoundSorce {
 private:
@@ -8,8 +9,8 @@ private:
 	FMOD_VECTOR _sorceVel = { 0.0,0,0 };
 	FMOD_VECTOR _coneDir = {0.0f, 1.0f, 0.0f}; // por defecto hacia adelante
 
-	float _minDistance = 2.0f;
-	float _maxDistance = 20.0f;
+	float _minDistance = 1.0f;
+	float _maxDistance = 1000.0f;
 
 	float _internalConeAngle = 360.0f;
 	float _exteriorConeAngle = 360.0f;

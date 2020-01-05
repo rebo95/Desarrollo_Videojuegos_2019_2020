@@ -1,12 +1,13 @@
 #include "SoundSorce.h"
 #include <iostream>
-
+#include "System.h"
 
 
 SoundSorce::SoundSorce(const char* filename, FMOD::System* system)
 {
 	_system = system;
 	_result = _system->createSound(filename, FMOD_3D|FMOD_LOOP_NORMAL, 0, &_sound);
+	System::ERRCHECK(_result);
 	_vol = 1.0f;
 }
 
@@ -21,6 +22,7 @@ void SoundSorce::Play()
 	//arrancamos el canal
 	_result = _system->playSound(_sound, 0, true, &_channel);
 	//colocamos el canal
+
 	_result = _channel->set3DAttributes(&_sorcePosition, &_sorceVel);
 	//inicializamos los valores de máxima y minima distancia
 	_result = _channel->set3DMinMaxDistance(_minDistance, _maxDistance);
@@ -136,8 +138,8 @@ void SoundSorce::DecreaseExteriorConeAngle()
 void SoundSorce::getSorceMovementAtributes()
 {
 	_result = _channel->get3DAttributes(&_sorcePosition, &_sorceVel);
-	std::cout << "PosiciónDeLaFuente : " << " x = " <<_sorcePosition.x << " y = "<<_sorcePosition.y <<" z ="<< _sorcePosition.z;
-	std::cout << "PosiciónDeLaFuente : " << " x = " << _sorceVel.x << " y = " << _sorceVel.y << " z =" << _sorceVel.z;
+	std::cout << "PosicionDeLaFuente : " << " x = " <<_sorcePosition.x << " y = "<<_sorcePosition.y <<" z ="<< _sorcePosition.z;
+	//std::cout << "PosiciónDeLaFuente : " << " x = " << _sorceVel.x << " y = " << _sorceVel.y << " z =" << _sorceVel.z;
 }
 
 void SoundSorce::setConeSettings()

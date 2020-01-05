@@ -1,5 +1,7 @@
 
 #include<fmod.hpp>
+#include<iostream>
+#include <fmod_errors.h>
 
 static class System
 {
@@ -14,4 +16,5 @@ public:
 
 	static void init();
 	static void update();
+	static void ERRCHECK(FMOD_RESULT result);
 };
