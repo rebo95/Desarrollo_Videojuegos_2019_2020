@@ -7,12 +7,13 @@
 class MyFMODSystem {
 
 public:
-	static FMOD::System* _system;
-	static FMOD_RESULT _result;
-
 	MyFMODSystem();
 	~MyFMODSystem();
 
+	static FMOD::System* _system;
+	static FMOD_RESULT _result;
+
+	static void init();
+	static void update();
 	static void ERRCHECK(FMOD_RESULT result);
-	static void Update();
 };

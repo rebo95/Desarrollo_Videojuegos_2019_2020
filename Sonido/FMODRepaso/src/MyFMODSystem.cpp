@@ -3,28 +3,36 @@
 FMOD::System* MyFMODSystem::_system = nullptr;
 FMOD_RESULT MyFMODSystem::_result;
 
+
 MyFMODSystem::MyFMODSystem()
 {
-	FMOD::System_Create(&_system);
-	_result = _system->init(128, FMOD_INIT_NORMAL, 0);
-	ERRCHECK(_result);
+
+
 }
 
 MyFMODSystem::~MyFMODSystem()
 {
-	_result = _system->release();
+
+}
+
+void MyFMODSystem::init()
+{
+	_result = System_Create(&_system);
 	ERRCHECK(_result);
+	_result = _system->init(128, FMOD_INIT_NORMAL, 0);
+	ERRCHECK(_result);
+}
+
+void MyFMODSystem::update()
+{
+	_system->update();
 }
 
 void MyFMODSystem::ERRCHECK(FMOD_RESULT result)
 {
 	if (result != FMOD_OK) {
 		std::cout << FMOD_ErrorString(result) << std::endl;
+		exit(-1);
 	}
-}
-
-void MyFMODSystem::Update()
-{
-	_result = _system->update();
-	ERRCHECK(_result);
+	else std::cout << "FMOD_OK" << std::endl;
 }
