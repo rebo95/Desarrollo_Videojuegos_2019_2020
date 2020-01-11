@@ -14,6 +14,18 @@ def load_data(file_name):
 
     return X, y, y_r
 
+def load_data_validation(file_name):
+    data = loadmat(file_name)
+    X = data['X']
+    y = data['y']
+    y_r = np.ravel(y)
+
+    Xval = data['Xval']
+    yval = data['yval']
+
+    return X, y_r , Xval, yval
+
+
 def displayData(X, y):
 
     pos_0 = np.where(y == 0)
@@ -76,7 +88,19 @@ def gaussian_Kernel(X1, X2, sigma):
             Gram[i, j] = np.exp(-np.sum(np.square(x1 - x2)) / (2 * (sigma**2)))
     return Gram
 #_________________________________________________________________________________________
-
+def optimal_C_sigma_Parameters(X, y_r, Xval, yval, max_i, tool ):
+    
+    predictions = dict() #almacenaremos la infrmacion relevante en un diccionario
+    for C in [0.01, 0.03, 0.1, 0.3, 1, 3, 10, 30]:
+        for sigma in[0.01, 0.03, 0.1, 0.3, 1, 3, 10, 30]:
+            model = SVM_gaussian_training(X, y_r, C, tool, max_i, sigma )
+            prediction = model.predict(gaussian_Kernel( Xval, X, sigma))
+            predictions[(C, sigma)] = np.mean((prediction != yval).astype(int))
+            
+    
+    C, sigma = min(predictions, key=predictions.get)
+    return C, sigma
+#_________________________________________________________________________________________
 def part1_main():
     #Parte 1.1
     X, y, y_r = load_data("ex6data1.mat")
@@ -99,10 +123,26 @@ def part2_main():
     X1, y1, y1_r = load_data("ex6data2.mat")
     svm_function_n_l = SVM_gaussian_training(X1, y1_r, c_param, tool, iterations, sigma)
     draw_Non_Linear_KernelFrontier(X1, y1_r, svm_function_n_l, sigma)
+
+def part3_main():
+    #Parte 1.3
+
+    tool = 1e-3
+    iterations = 100
+
+    X, y_r , Xval, yval = load_data_validation("ex6data3.mat")
+
+    optC, optSigma = optimal_C_sigma_Parameters(X, y_r, Xval, yval, iterations, tool)
+
+    svm_function_optimal_C_sigma = SVM_gaussian_training(X, y_r, optC, tool, iterations, optSigma)
+    draw_Non_Linear_KernelFrontier(X, y_r, svm_function_optimal_C_sigma, optSigma)
+    
+
     
 def main():
-    part1_main()
-    part2_main()
+    #part1_main()
+    #part2_main()
+    part3_main()
 #_________________________________________________________________________________________
 
 
