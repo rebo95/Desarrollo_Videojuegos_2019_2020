@@ -1,10 +1,127 @@
 import numpy as np
 from scipy.io import loadmat
 import matplotlib.pyplot as plt
-
+import codecs
 from sklearn import svm 
 
+import re
+import nltk
+import nltk.stem.porter
+
+import os
+
 #_________________________________________________________________________________________
+#Procesado de emails
+#_________________________________________________________________________________________
+
+def preProcess(email):
+    
+    hdrstart = email.find("\n\n")
+    if hdrstart != -1:
+        email = email[hdrstart:]
+
+    email = email.lower()
+    # Strip html tags. replace with a space
+    email = re.sub('<[^<>]+>', ' ', email)
+    # Any numbers get replaced with the string 'number'
+    email = re.sub('[0-9]+', 'number', email)
+    # Anything starting with http or https:// replaced with 'httpaddr'
+    email = re.sub('(http|https)://[^\s]*', 'httpaddr', email)
+    # Strings with "@" in the middle are considered emails --> 'emailaddr'
+    email = re.sub('[^\s]+@[^\s]+', 'emailaddr', email)
+    # The '$' sign gets replaced with 'dollar'
+    email = re.sub('[$]+', 'dollar', email)
+    return email
+
+
+def email2TokenList(raw_email):
+    """
+    Function that takes in a raw email, preprocesses it, tokenizes it,
+    stems each word, and returns a list of tokens in the e-mail
+    """
+
+    stemmer = nltk.stem.porter.PorterStemmer()
+    email = preProcess(raw_email)
+
+    # Split the e-mail into individual words (tokens) 
+    tokens = re.split('[ \@\$\/\#\.\-\:\&\*\+\=\[\]\?\!\(\)\{\}\,\'\"\>\_\<\;\%]',
+                      email)
+
+    # Loop over each token and use a stemmer to shorten it
+    tokenlist = []
+    for token in tokens:
+
+        token = re.sub('[^a-zA-Z0-9]', '', token)
+        stemmed = stemmer.stem(token)
+        #Throw out empty tokens
+        if not len(token):
+            continue
+        # Store a list of all unique stemmed words
+        tokenlist.append(stemmed)
+
+    return tokenlist
+
+#_________________________________________________________________________________________
+#Procesado diccionario
+#_________________________________________________________________________________________
+
+def getVocabDict(reverse=False):
+    """
+    Function to read in the supplied vocab list text file into a dictionary.
+    Dictionary key is the stemmed word, value is the index in the text file
+    If "reverse", the keys and values are switched.
+    """
+    vocab_dict = {}
+    with open("vocab.txt") as f:
+        for line in f:
+            (val, key) = line.split()
+            if not reverse:
+                vocab_dict[key] = int(val)
+            else:
+                vocab_dict[int(val)] = key
+
+    return vocab_dict
+
+#_________________________________________________________________________________________
+#Procesado de archivos de texto
+#_________________________________________________________________________________________
+
+def procces_txt_data(path):
+
+    file = []
+    # r=root, d=directories, f = files
+    for r, d, f in os.walk(path):
+        for file in f:
+            if '.txt' in file:
+                file.append(os.path.join(r, file))
+
+    j = 0
+    vocab_dict = keyDictionaryLoader()
+
+    arrayDict = np.array(list(vocab_dict.items()))
+
+    X = np.zeros((len(file), len(arrayDict)))
+
+    for f in file:
+        email_contents = codecs.open(f, "r", encoding="utf−8", errors="ignore").read()
+
+        email = email2TokenList(email_contents)
+
+        aux = np.zeros(len(arrayDict))
+
+        for i in range(len(email)):
+            index = np.where(arrayDict[:, 0] == email[i])
+            aux[index] = 1
+
+        X[j] = aux
+        j = j + 1
+
+    print("Archivos de ", path, "leídos y guardados en X.")
+    return X
+
+#_________________________________________________________________________________________
+
+
 def load_data(file_name):
     data = loadmat(file_name)
 
@@ -101,6 +218,19 @@ def optimal_C_sigma_Parameters(X, y_r, Xval, yval, max_i, tool ):
     C, sigma = min(predictions, key=predictions.get)
     return C, sigma
 #_________________________________________________________________________________________
+#Procesado de datos e-mail
+
+def load_corpus(file_name):
+    email_contents = open(file_name, 'r', encoding='utf-8', errors = 'ignore').read()
+    email = email2TokenList(email_contents)
+    return email
+
+def keyDictionaryLoader():
+    return getVocabDict()
+
+#_________________________________________________________________________________________
+#Practica6 Parte1
+#_________________________________________________________________________________________
 def part1_main():
     #Parte 1.1
     X, y, y_r = load_data("ex6data1.mat")
@@ -137,14 +267,27 @@ def part3_main():
     svm_function_optimal_C_sigma = SVM_gaussian_training(X, y_r, optC, tool, iterations, optSigma)
     draw_Non_Linear_KernelFrontier(X, y_r, svm_function_optimal_C_sigma, optSigma)
     
-
+#_________________________________________________________________________________________
+#Practica6 Parte2
+#_________________________________________________________________________________________
     
-def main():
-    #part1_main()
-    #part2_main()
+
+def mainPart1():
+    part1_main()
+    part2_main()
     part3_main()
 #_________________________________________________________________________________________
 
+def mainPart2():
+    
+    print("Hola mundo")
+
+
+
+
+
+def main():
+    mainPart2()
 
 
 main()
