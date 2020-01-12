@@ -237,6 +237,8 @@ def neuronal_succes_percentage(X, y, theta1, theta2) :
 
 
 np.set_printoptions(threshold=sys.maxsize)
+
+
 def main():
 
     reg = 1

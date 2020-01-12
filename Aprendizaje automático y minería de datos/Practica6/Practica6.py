@@ -275,7 +275,7 @@ def part3_main():
 def mainPart1():
     #part1_main()
     #part2_main()
-    part3_main()
+    #part3_main()
 #_________________________________________________________________________________________
 
 def mainPart2():
